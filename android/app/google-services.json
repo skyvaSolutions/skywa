@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "908414587240",
+    "project_id": "skywa-7f403",
+    "storage_bucket": "skywa-7f403.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908414587240:android:ca16b0d629ea57f00b86dd",
+        "android_client_info": {
+          "package_name": "com.example.skywa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "908414587240-720uv19cbllujmtep1udohssid7rbc5g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skywa",
+            "certificate_hash": "6b38932e69944046f7af8d028eb96bbb7794e826"
+          }
+        },
+        {
+          "client_id": "908414587240-u23v73f2c86400bkk2otthdq3mdgl3h6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjyRNhVP3HagA2owr0pem95hGHacfdpAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "908414587240-u23v73f2c86400bkk2otthdq3mdgl3h6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

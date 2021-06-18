@@ -140,6 +140,7 @@ class UserService {
 
       Map userMap = response.data;
       print("$funcName Response found");
+      print("User Data--------------");
       print(response.data);
       userInfo = UserInfo.fromJson(userMap);
       return (true);

@@ -183,7 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: nearbyQs.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding:
+                        const EdgeInsets.only(left: 13, right: 13, top: 8.0),
                     child: BusinessWidget(
                       name: nearbyQs[index].companyName,
                       address: nearbyQs[index].address,

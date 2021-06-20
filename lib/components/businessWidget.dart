@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
   final name, address;
@@ -116,7 +117,9 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await showMyDialog(context, widget.name.toString());
+                      },
                       child: Text("Check In"),
                     )
                   ],

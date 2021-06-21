@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/Providers/ThemeProvider.dart';
+import 'package:skywa/api_calls/find_users.dart';
+import 'package:skywa/api_responses/get_person.dart';
+import 'package:skywa/model/person.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/services/deviceInfoService.dart';
@@ -88,9 +91,10 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       Navigator.pushReplacementNamed(context, HomeScreen.id);
     }
+/////////////////////////calling GetMyPeople API to check whether there is a registered customer or not with this device//////////////////////////////////////////////////////
+     findUsers.returnPerson(context);
   }
 }
-
 Future<void> getProfileData() async {
   print("Getting profile Data");
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -101,6 +105,9 @@ Future<void> getProfileData() async {
       readBoolFromLocal(prefs, userSettings.userSetting1.key, false);
   userSettings.numUsages.value = updateNumberOfUsages(prefs);
 }
+
+
+
 
 class PushNotification {
   PushNotification({

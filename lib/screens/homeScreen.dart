@@ -138,7 +138,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
         // extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: Text("Welcome"),
+          centerTitle: true,
+          title: Text(
+            "Welcome",
+            style: GoogleFonts.poppins(),
+          ),
           actions: [
             IconButton(
                 onPressed: () {
@@ -153,6 +157,23 @@ class _HomeScreenState extends State<HomeScreen> {
           //   backgroundColor: kAppBarColor,
         ),
         drawer: AppDrawer(),
+        bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: GoogleFonts.poppins(fontSize: 15),
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.list_alt),
+                label: 'Current Bookings',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today),
+                label: 'Future Bookings',
+              )
+            ]),
         body: StreamProvider<NetworkStatus>(
           initialData: NetworkStatus.Online,
           create: (context) =>
@@ -163,7 +184,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: nearbyQs.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding:
+                        const EdgeInsets.only(left: 13, right: 13, top: 8.0),
                     child: BusinessWidget(
                       name: nearbyQs[index].companyName,
                       address: nearbyQs[index].address,

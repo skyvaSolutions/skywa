@@ -29,6 +29,11 @@ DateTime convertDateFromString(String strDate){
   return dob;
 }
 
+void callApis(BuildContext context , Map<String , String> formValues) async {
+  await addUser.addNewUser(formValues);
+  await findUsers.returnPerson(context);
+}
+
 class ProfileEditPage extends StatefulWidget {
     static const String id = 'profileEditScreen';
 
@@ -47,11 +52,11 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _formKey.currentState.patchValue({"Address": l.location});
   }
   /////////////////call the GetMyPeople API to get the updated values////////////////////////
-  @override
-  void initState() {
-    super.initState();
-    findUsers.returnPerson(context);
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   findUsers.returnPerson(context);
+  // }
 
   final nameHolder = TextEditingController(text: getPerson.isPersonRegistered ? getPerson.person.FirstName +" " + getPerson.person.LastName : null);
   final emailHolder = TextEditingController(text : getPerson.isPersonRegistered ? getPerson.person.PersonEmail : null);
@@ -287,7 +292,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                             }
 
                           }
-                          if(_formKey.currentState.value["Gender"] != null && _formKey.currentState.value["Gender"] == ''){
+                          if(_formKey.currentState.value["Gender"] != null){
                             formValues['Sex'] = _formKey.currentState.value["Gender"];
                           }
                           if(_formKey.currentState.value["Address"] != null){
@@ -301,8 +306,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           }
 
 ///////////////////////////// again call the two apis for adding and updating/////////////////////////////////////
-                          addUser.addNewUser(formValues);
-                          findUsers.returnPerson(context);
+                          callApis(context , formValues);
 
 
 

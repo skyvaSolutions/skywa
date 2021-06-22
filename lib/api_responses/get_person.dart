@@ -4,4 +4,5 @@ GetPerson getPerson = new GetPerson();
 class GetPerson{
   Person person;
   bool isPersonRegistered;
+  Map<String , String> fetchedVal;
 }

@@ -12,6 +12,8 @@ import 'package:skywa/Global&Constants/DeviceDetailsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
+import 'package:skywa/screens/Appointment.dart';
+import 'package:skywa/screens/CurrentBookings.dart';
 import 'package:skywa/screens/helpScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
@@ -131,8 +133,9 @@ class _HomeScreenState extends State<HomeScreen> {
     'Cook',
     'Carline'
   ];
+  int _selected = 0;
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
-
+  List<Widget> body = [HomeBar(), CurrentBookings(), Appointment()];
   Widget build(BuildContext context) {
     return Scaffold(
         // extendBodyBehindAppBar: true,
@@ -157,6 +160,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: AppDrawer(),
         bottomNavigationBar: BottomNavigationBar(
+            onTap: (e) {
+              setState(() {
+                _selected = e;
+              });
+            },
+            currentIndex: _selected,
             type: BottomNavigationBarType.fixed,
             selectedLabelStyle: GoogleFonts.poppins(fontSize: 15),
             items: [
@@ -170,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.calendar_today),
-                label: 'Future Bookings',
+                label: 'Appointments',
               )
             ]),
         body: StreamProvider<NetworkStatus>(
@@ -178,21 +187,31 @@ class _HomeScreenState extends State<HomeScreen> {
           create: (context) =>
               NetworkStatusService().networkStatusController.stream,
           child: NetworkAwareWidget(
-            onlineChild: ListView.builder(
-                padding: const EdgeInsets.all(4),
-                itemCount: nearbyQs.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 13, right: 13, top: 8.0),
-                    child: BusinessWidget(
-                      name: nearbyQs[index].companyName,
-                      address: nearbyQs[index].address,
-                    ),
-                  );
-                }),
+            onlineChild: body[_selected],
           ),
         ));
+  }
+}
+
+class HomeBar extends StatelessWidget {
+  const HomeBar({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        padding: const EdgeInsets.all(4),
+        itemCount: nearbyQs.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 13, right: 13, top: 8.0),
+            child: BusinessWidget(
+              name: nearbyQs[index].companyName,
+              address: nearbyQs[index].address,
+            ),
+          );
+        });
   }
 }
 

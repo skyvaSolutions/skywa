@@ -12,6 +12,8 @@ import 'package:skywa/Global&Constants/DeviceDetailsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
+import 'package:skywa/screens/appointment_status.dart';
+import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/screens/helpScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
@@ -30,6 +32,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int selectedPage = 0;
+
+  final _pageOptions = [
+    HomeBar(),
+    CurrentScreen(),
+    HomeBar()
+  ];
   StreamSubscription _connectionChangeStream;
   FirebaseMessaging _messaging;
   int _totalNotifications = 0;
@@ -173,27 +182,57 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(Icons.calendar_today),
                 label: 'Future Bookings',
               )
-            ]),
+            ],
+          currentIndex: selectedPage,
+          onTap: (index){
+            setState(() {
+              selectedPage = index;
+            });
+          },
+        ),
         body: StreamProvider<NetworkStatus>(
           initialData: NetworkStatus.Online,
           create: (context) =>
               NetworkStatusService().networkStatusController.stream,
           child: NetworkAwareWidget(
-            onlineChild: ListView.builder(
-                padding: const EdgeInsets.all(4),
-                itemCount: nearbyQs.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 13, right: 13, top: 8.0),
-                    child: BusinessWidget(
-                      name: nearbyQs[index].companyName,
-                      address: nearbyQs[index].address,
-                    ),
-                  );
-                }),
+            onlineChild: _pageOptions[selectedPage],
+            // onlineChild: ListView.builder(
+            //     padding: const EdgeInsets.all(4),
+            //     itemCount: nearbyQs.length,
+            //     itemBuilder: (BuildContext context, int index) {
+            //       return Padding(
+            //         padding:
+            //             const EdgeInsets.only(left: 13, right: 13, top: 8.0),
+            //         child: BusinessWidget(
+            //           name: nearbyQs[index].companyName,
+            //           address: nearbyQs[index].address,
+            //         ),
+            //       );
+            //     }),
           ),
         ));
+  }
+}
+
+class HomeBar extends StatelessWidget {
+  const HomeBar({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        padding: const EdgeInsets.all(4),
+        itemCount: nearbyQs.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 13, right: 13, top: 8.0),
+            child: BusinessWidget(
+              name: nearbyQs[index].companyName,
+              address: nearbyQs[index].address,
+            ),
+          );
+        });
   }
 }
 

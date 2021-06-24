@@ -5,4 +5,5 @@ CurrentReservation currentReservation = new CurrentReservation();
 class CurrentReservation{
   Reservation currentRes ;
   String CurrentReservationId;
+  String QId;
 }

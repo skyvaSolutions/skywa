@@ -13,18 +13,18 @@ import 'package:skywa/screens/appointment_status.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
 
-
-
-
 Future<void> getAndSortReservations() async {
   await getMyReservations.findReservations();
-  if(myReservations.noReservations == false){
-    myReservations.reservationsList.sort((res1 , res2) => convertDateFromString(res1.ReservationStartTime).compareTo(convertDateFromString(res2.ReservationStartTime)));
+  if (myReservations.noReservations == false) {
+    myReservations.reservationsList.sort((res1, res2) =>
+        convertDateFromString(res1.ReservationStartTime)
+            .compareTo(convertDateFromString(res2.ReservationStartTime)));
     print(myReservations.reservationsList[0].ReservationStartTime);
-    currentReservation.CurrentReservationId = myReservations.reservationsList[0].ReservationID;
+    currentReservation.CurrentReservationId =
+        myReservations.reservationsList[0].ReservationID;
+    currentReservation.QId = myReservations.reservationsList[0].QID;
     await getSingleReservation.getCurrentReservation();
   }
-
 }
 
 class CurrentScreen extends StatefulWidget {
@@ -36,16 +36,16 @@ class _CurrentScreenState extends State<CurrentScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
-      future: getAndSortReservations(),
-        builder: (BuildContext context , AsyncSnapshot<void> snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting ){
-            return  Container(
+        future: getAndSortReservations(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(
               alignment: Alignment.center,
               child: Column(
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width*0.9,
-                    height: MediaQuery.of(context).size.height*0.6,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.6,
                     child: Image.asset(
                       'assets/images/loading.png',
                     ),
@@ -61,20 +61,18 @@ class _CurrentScreenState extends State<CurrentScreen> {
                 ],
               ),
             );
-          }
-          else{
-            if(snapshot.hasError){
-              return  Center(child: Text(snapshot.error));
-            }
-            else{
+          } else {
+            if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error));
+            } else {
               if (myReservations.noReservations == true) {
                 return Container(
                   alignment: Alignment.center,
                   child: Column(
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width*0.9,
-                        height: MediaQuery.of(context).size.height*0.6,
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.6,
                         child: Image.asset(
                           'assets/images/no_reservations.png',
                         ),
@@ -90,10 +88,12 @@ class _CurrentScreenState extends State<CurrentScreen> {
                     ],
                   ),
                 );
-              } if(myReservations.noReservations == false) {
+              }
+              if (myReservations.noReservations == false) {
                 return MultiProvider(
                   providers: [
-                    ChangeNotifierProvider<MemberStateChanged>(create: (context)=>MemberStateChanged()),
+                    ChangeNotifierProvider<MemberStateChanged>(
+                        create: (context) => MemberStateChanged()),
                   ],
                   child: Container(
                     child: Column(
@@ -107,7 +107,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
                             SizedBox(
                               height: 10.0,
                             ),
-                            AppointmentStatus(),
+                            Center(child: AppointmentStatus()),
                           ],
                         )),
                         Footer(),
@@ -115,16 +115,11 @@ class _CurrentScreenState extends State<CurrentScreen> {
                     ),
                   ),
                 );
-              }
-              else
+              } else
                 return Container();
             }
           }
-
-
-    }
-    );
-
+        });
   }
 
   @override
@@ -148,10 +143,10 @@ class UpperContainer extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 9,
-              offset: Offset(4,4)// changes position of shadow
-            ),
+                color: Colors.black.withOpacity(0.5),
+                blurRadius: 9,
+                offset: Offset(4, 4) // changes position of shadow
+                ),
           ],
           color: Theme.of(context).primaryColor),
       child: Header(),
@@ -163,7 +158,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0 , horizontal: 20.0),
+      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -212,19 +207,21 @@ class AppointmentDateTime extends StatefulWidget {
 class _AppointmentDateTimeState extends State<AppointmentDateTime> {
   @override
   Widget build(BuildContext context) {
-    DateTime dateCon = convertDateFromString( currentReservation.currentRes.ReservationStartTime);
-    String date = dateCon.day.toString() + "-" + dateCon.month.toString() + "-" + dateCon.year.toString();
-    String time = dateCon.hour.toString() + ":" + dateCon.minute.toString() ;
+    DateTime dateCon = convertDateFromString(
+        currentReservation.currentRes.ReservationStartTime);
+    String date = dateCon.day.toString() +
+        "-" +
+        dateCon.month.toString() +
+        "-" +
+        dateCon.year.toString();
+    String time = dateCon.hour.toString() + ":" + dateCon.minute.toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           'Date : $date',
           style: TextStyle(
-            fontSize: 15.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white
-          ),
+              fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(
           height: 10.0,
@@ -232,22 +229,18 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
         Text(
           'Time : $time',
           style: TextStyle(
-              fontSize: 15.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-          ),
+              fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ],
     );
   }
 }
 
-
 class Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +255,7 @@ class Footer extends StatelessWidget {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.4),
                       blurRadius: 4,
-                      offset: Offset(3,3),
+                      offset: Offset(3, 3),
                     ),
                   ],
                   color: Theme.of(context).primaryColor,
@@ -303,7 +296,7 @@ class Footer extends StatelessWidget {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.4),
                       blurRadius: 4,
-                      offset: Offset(3,3),
+                      offset: Offset(3, 3),
                     ),
                   ],
                   color: Theme.of(context).primaryColor,
@@ -342,7 +335,7 @@ class Footer extends StatelessWidget {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.4),
                       blurRadius: 4,
-                      offset: Offset(3,3),
+                      offset: Offset(3, 3),
                     ),
                   ],
                   color: Theme.of(context).primaryColor,
@@ -381,7 +374,7 @@ class Footer extends StatelessWidget {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.4),
                       blurRadius: 4,
-                      offset: Offset(3,3),
+                      offset: Offset(3, 3),
                     ),
                   ],
                   color: Theme.of(context).primaryColor,
@@ -405,7 +398,9 @@ class Footer extends StatelessWidget {
                 child: Text(
                   'Call Business',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).primaryColor,),
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
             ],

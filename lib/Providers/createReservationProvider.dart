@@ -53,8 +53,9 @@ class createReservationProvider with ChangeNotifier {
       "CompanyName": CompanyName
     };
     print(data);
+    print("Adding a Reservation");
     var response = await dio.post(
-        "https://shoeboxtx.veloxe.com:36251/api/AddOrUpdatePersonPost",
+        "https://shoeboxtx.veloxe.com:36251/api/AddorUpdateReservationPost",
         data: data);
     print(response.data);
   }

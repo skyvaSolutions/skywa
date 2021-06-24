@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:skywa/Global&Constants/DeviceDetailsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
+import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
 import 'package:skywa/screens/appointment_status.dart';
@@ -25,14 +26,17 @@ import 'package:skywa/utils/Network_aware.dart';
 import 'package:http/http.dart' as http;
 import 'package:skywa/api_calls/find_users.dart';
 
+
+
 class HomeScreen extends StatefulWidget {
   static const String id = 'homeScreen';
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>{
   int selectedPage = 0;
+
 
   final _pageOptions = [
     HomeBar(),
@@ -48,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     registerNotification();
     checkForInitialMessage();
+
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       PushNotification notification = PushNotification(
         title: message.notification?.title,
@@ -59,11 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
         _totalNotifications++;
       });
     });
+
   }
+
 
   Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print("Handling a background message: ${message.messageId}");
   }
+
 
   void registerNotification() async {
     await Firebase.initializeApp();

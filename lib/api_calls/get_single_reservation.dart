@@ -19,7 +19,7 @@ class GetSingleReservation{
     double long = l.p.longitude;
     print("GetSingleReservation api called");
     String url =
-        "https://shoeboxtx.veloxe.com:36251/api/getSingleReservation?UserToken=95A5B76C-9B05-4992-A44D-DEA8E7AE094C644791499&ReservationID=7DEA4D46-C9B6-429D-BBF7-6F4635F1DAED&Latitude=30.5&Longitude=-97.8";
+        "https://shoeboxtx.veloxe.com:36251/api/getSingleReservation?UserToken=$deviceId&ReservationID=$reservationId&Latitude=$lat&Longitude=$long";
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       print('GetSingleReservation : Success');

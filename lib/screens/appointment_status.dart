@@ -12,7 +12,9 @@ import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_calls/q_meta_data.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/screens/homeScreen.dart';
+import 'package:skywa/utils/open_google_map.dart';
 import 'package:timelines/timelines.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const kTileHeight = 50.0;
 
@@ -23,7 +25,7 @@ const inProgressColor = Color(0xFFFFA63C);
 const todoColor = Color(0xffd1d2d7);
 
 bool stopDistanceTimer = false;
-bool stopArrivedTimer = false;
+bool stopArrivedTimer = true;//todo
 
 void callUpdateReservationApi(Map<String, dynamic> reservationValues) async {
   await addUpdateReservation.addUpdateRes(reservationValues);
@@ -73,9 +75,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
     }
   }
 
-  Future<void> _future;
-
-  Future<void> checkStateAfterThirtySeconds() async {
+  Future<void> checkStateAfterArrival() async {
     await getSingleReservation.getCurrentReservation();
     if (currentReservation.currentRes.MemberState == "Called To Enter") {
       stopArrivedTimer = true;
@@ -85,12 +85,14 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 
   Future<void> checkForDistance() async {
     double calculatedDistance = await qMetaData.calculateDistance();
-    if (calculatedDistance <= 300) {
-      Map<String, dynamic> reservationValues = resObject();
-      await addUpdateReservation.addUpdateRes(reservationValues);
-      await getSingleReservation.getCurrentReservation();
-      stopDistanceTimer = true;
-      setState(() {});
+    if (calculatedDistance != -1) {
+      if (calculatedDistance <= qMetaData.parkingLotDistance) {
+        Map<String, dynamic> reservationValues = resObject();
+        await addUpdateReservation.addUpdateRes(reservationValues);
+        await getSingleReservation.getCurrentReservation();
+        stopDistanceTimer = true;
+        setState(() {});
+      }
     }
   }
 
@@ -99,10 +101,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
       if (stopArrivedTimer) {
         timer.cancel();
       }
-      // setState(() {
-      //   _future = checkStateAfterThirtySeconds();
-      // });
-      checkStateAfterThirtySeconds();
+      checkStateAfterArrival();
     });
   }
 
@@ -126,304 +125,354 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-        future: _future,
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 20.0,
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (context.read<MemberStateChanged>().statusIndex != 1)
+                ElevatedButton(
+                  onPressed: () {
+                    MapUtils.openMap(31.968599, -99.901810);
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.directions,
+                        color: Colors.white,
+                        size: 20.0,
+                      ),
+                      SizedBox(
+                        width: 8.0,
+                      ),
+                      Text(
+                        'Directions',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
-                  Container(
-                      child: CircularProgressIndicator(
-                    color: Theme.of(context).primaryColor,
-                  )),
-                  SizedBox(
-                    height: 20.0,
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).primaryColor)),
+                ),
+              if (currentReservation.currentRes.MemberState == "Arrived")
+                Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Expected Wait : ' +
+                        currentReservation.currentRes.WaitTime.toString() +
+                        " minutes",
+                    style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold),
                   ),
-                  Text(
-                    'Updating your Reservation Status...',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            if (snapshot.hasError)
-              return Center(child: Text(snapshot.error));
-            else {
-              return Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (context.read<MemberStateChanged>().statusIndex != 1)
-                          ElevatedButton(
-                            onPressed: () {},
-                            child: Row(
+                ),
+              ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: Container(
+                            padding: EdgeInsets.all(10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.directions,
-                                  color: Colors.white,
-                                  size: 30.0,
+                                  Icons.warning_amber_rounded,
+                                  size: 50.0,
+                                  color: Colors.redAccent,
                                 ),
                                 SizedBox(
-                                  width: 8.0,
+                                  height: 20.0,
                                 ),
                                 Text(
-                                  'Directions',
-                                  style: TextStyle(color: Colors.white),
+                                  'Delete Reservation',
+                                  style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey[850],
+                                  ),
                                 ),
+                                SizedBox(
+                                  height: 8.0,
+                                ),
+                                Text(
+                                  'Are you sure you want to permanently delete this Reservation.',
+                                  style: TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.grey[800],
+                                  ),
+                                )
                               ],
                             ),
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    Theme.of(context).primaryColor)),
                           ),
-                        if (currentReservation.currentRes.MemberState ==
-                            "Arrived")
-                          Container(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              'Expected Wait : ' +
-                                  currentReservation.currentRes.WaitTime
-                                      .toString() +
-                                  " minutes",
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold
-                              ),
+                          titlePadding: EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 20.0),
+                          contentPadding: EdgeInsets.all(10.0),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel'),
                             ),
-                          ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await deleteReservation.deleteRes();
-                          },
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.cancel,
-                                color: Colors.white,
-                                size: 20.0,
+                            ElevatedButton(
+                              onPressed: () async {
+                                await deleteReservation.deleteRes();
+                                setState(() {});
+                              },
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
-                              SizedBox(
-                                width: 8.0,
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.redAccent),
                               ),
-                              Text(
-                                'Cancel',
-                              ),
-                            ],
-                          ),
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.redAccent)),
-                        ),
-                      ],
+                            )
+                          ],
+                        );
+                      });
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.cancel,
+                      color: Colors.white,
+                      size: 20.0,
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    Text(
+                      'Cancel',
+                    ),
+                  ],
+                ),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.redAccent)),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 20.0,
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height * 0.15,
+          child: Timeline.tileBuilder(
+            theme: TimelineThemeData(
+              direction: Axis.horizontal,
+              connectorTheme: ConnectorThemeData(
+                space: 30.0,
+                thickness: 5.0,
+              ),
+            ),
+            builder: TimelineTileBuilder.connected(
+              connectionDirection: ConnectionDirection.before,
+              itemExtentBuilder: (_, __) =>
+                  MediaQuery.of(context).size.width / _processes.length,
+              oppositeContentsBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10.0),
+                  child: Icon(
+                    timelineIcons[index],
+                    color: getColor(index),
+                    size: 30.0,
+                  ),
+                );
+              },
+              contentsBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    _processes[index],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: getColor(index),
                     ),
                   ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    child: Timeline.tileBuilder(
-                      theme: TimelineThemeData(
-                        direction: Axis.horizontal,
-                        connectorTheme: ConnectorThemeData(
-                          space: 30.0,
-                          thickness: 5.0,
-                        ),
-                      ),
-                      builder: TimelineTileBuilder.connected(
-                        connectionDirection: ConnectionDirection.before,
-                        itemExtentBuilder: (_, __) =>
-                            MediaQuery.of(context).size.width /
-                            _processes.length,
-                        oppositeContentsBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 15.0),
-                            child: Icon(
-                              timelineIcons[index],
-                              color: getColor(index),
-                              size: 40.0,
-                            ),
-                          );
-                        },
-                        contentsBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 15.0),
-                            child: Text(
-                              _processes[index],
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: getColor(index),
-                                fontSize: 15.0
-                              ),
-                            ),
-                          );
-                        },
-                        indicatorBuilder: (_, index) {
-                          var color;
-                          var child;
-                          if (index ==
-                              context.read<MemberStateChanged>().statusIndex) {
-                            color = inProgressColor;
-                          } else if (index <
-                              context.read<MemberStateChanged>().statusIndex) {
-                            color = completeColor;
-                          } else {
-                            color = todoColor;
-                          }
+                );
+              },
+              indicatorBuilder: (_, index) {
+                var color;
+                var child;
+                if (index == context.read<MemberStateChanged>().statusIndex) {
+                  color = inProgressColor;
+                } else if (index <
+                    context.read<MemberStateChanged>().statusIndex) {
+                  color = completeColor;
+                } else {
+                  color = todoColor;
+                }
 
-                          if (index <=
-                              context.read<MemberStateChanged>().statusIndex) {
-                            return Stack(
-                              children: [
-                                DotIndicator(
-                                  size: 15.0,
-                                  color: color,
-                                  child: child,
-                                ),
-                              ],
-                            );
-                          } else {
-                            return Stack(
-                              children: [
-                                OutlinedDotIndicator(
-                                  borderWidth: 4.0,
-                                  color: color,
-                                ),
-                              ],
-                            );
-                          }
-                        },
-                        connectorBuilder: (_, index, type) {
-                          if (index > 0) {
-                            if (index ==
-                                context
-                                    .read<MemberStateChanged>()
-                                    .statusIndex) {
-                              final prevColor = getColor(index - 1);
-                              final color = getColor(index);
-                              List<Color> gradientColors;
-                              if (type == ConnectorType.start) {
-                                gradientColors = [
-                                  Color.lerp(prevColor, color, 0.5),
-                                  color
-                                ];
-                              } else {
-                                gradientColors = [
-                                  prevColor,
-                                  Color.lerp(prevColor, color, 0.5)
-                                ];
-                              }
-                              return DecoratedLineConnector(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: gradientColors,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return SolidLineConnector(
-                                color: getColor(index),
-                              );
-                            }
-                          } else {
-                            return null;
-                          }
-                        },
-                        itemCount: _processes.length,
+                if (index <= context.read<MemberStateChanged>().statusIndex) {
+                  return Stack(
+                    children: [
+                      DotIndicator(
+                        size: 15.0,
+                        color: color,
+                        child: child,
+                      ),
+                    ],
+                  );
+                } else {
+                  return Stack(
+                    children: [
+                      OutlinedDotIndicator(
+                        borderWidth: 4.0,
+                        color: color,
+                      ),
+                    ],
+                  );
+                }
+              },
+              connectorBuilder: (_, index, type) {
+                if (index > 0) {
+                  if (index == context.read<MemberStateChanged>().statusIndex) {
+                    final prevColor = getColor(index - 1);
+                    final color = getColor(index);
+                    List<Color> gradientColors;
+                    if (type == ConnectorType.start) {
+                      gradientColors = [
+                        Color.lerp(prevColor, color, 0.5),
+                        color
+                      ];
+                    } else {
+                      gradientColors = [
+                        prevColor,
+                        Color.lerp(prevColor, color, 0.5)
+                      ];
+                    }
+                    return DecoratedLineConnector(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: gradientColors,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return SolidLineConnector(
+                      color: getColor(index),
+                    );
+                  }
+                } else {
+                  return null;
+                }
+              },
+              itemCount: _processes.length,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.0),
+                width: double.maxFinite,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(10.0),
+                  ),
+                  color: Color(0xFFFFA63C),
+                ),
+                child: Text(
+                  statusMess[context.read<MemberStateChanged>().statusIndex],
+                  style: TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+              if (context.read<MemberStateChanged>().statusIndex == 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      print(currentReservation.currentRes.DevideID);
+                      Map<String, dynamic> reservationValues = resObject();
+                      await addUpdateReservation
+                          .addUpdateRes(reservationValues);
+                      await getSingleReservation.getCurrentReservation();
+                      if (currentReservation.currentRes.MemberState ==
+                          "Arrived")
+                        Provider.of<MemberStateChanged>(context, listen: false)
+                            .changeStatusIndex(1);
+                      setState(() {});
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).primaryColor),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Arrived',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Colors.grey[400]),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                      ),
+                    ),
+                    child: Text(
+                      'Running Late',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(8.0),
-                          width: double.maxFinite,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(10.0),
-                            ),
-                            color: Color(0xFFFFA63C),
-                          ),
-                          child: Text(
-                            statusMess[
-                                context.read<MemberStateChanged>().statusIndex],
-                            style: TextStyle(
-                                fontSize: 15.0,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
+                  TextButton(
+                    onPressed: () {},
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Colors.grey[400]),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
                         ),
-                        if (context.read<MemberStateChanged>().statusIndex == 0)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              TextButton(
-                                onPressed: () async {
-                                  print(currentReservation.currentRes.DevideID);
-                                  Map<String, dynamic> reservationValues =
-                                      resObject();
-                                  await addUpdateReservation
-                                      .addUpdateRes(reservationValues);
-                                  await getSingleReservation
-                                      .getCurrentReservation();
-                                  if (currentReservation
-                                          .currentRes.MemberState ==
-                                      "Arrived")
-                                    Provider.of<MemberStateChanged>(context,
-                                            listen: false)
-                                        .changeStatusIndex(1);
-                                  setState(() {});
-                                },
-                                child: Text(
-                                  'Arrived',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Running Late',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: Text(
-                                  'Available Early',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              )
-                            ],
-                          )
-                      ],
+                      ),
+                    ),
+                    child: Text(
+                      'Available Early',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white
+                      ),
                     ),
                   )
                 ],
-              );
-            }
-          }
-        });
+              )
+            ],
+          ),
+        )
+      ],
+    );
   }
 }
 
@@ -435,9 +484,9 @@ final _processes = [
 ];
 
 final statusMess = [
-  'You have not arrived at the Business, once you arrive the business will be notified that you are ready for your appointment.'
-      'We are ready for you please walk to the entrance.',
+  'You have not arrived at the Business, once you arrive the business will be notified that you are ready for your appointment.',
   'You have arrived for the appointment. please wait near by until called.',
+  'We are ready for you please walk to the entrance.',
   'Your appointment is in progress.',
 ];
 

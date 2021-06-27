@@ -15,7 +15,7 @@ class GetMyReservations{
   void findReservations() async {
     print("GetMyReservations api called");
     String deviceId = userSettings.deviceID.value;
-    String url = "https://shoeboxtx.veloxe.com:36251/api/GetMyReservations?UserToken=95A5B76C-9B05-4992-A44D-DEA8E7AE094C644791499";
+    String url = "https://shoeboxtx.veloxe.com:36251/api/GetMyReservations?UserToken=$deviceId";
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       print('GetMyReservations : Success');
@@ -30,8 +30,6 @@ class GetMyReservations{
           myReservations.reservationsList.add(Reservation.fromJson(element))
         );
       }
-        print(myReservations.reservationsList);
-        print(myReservations.noReservations);
     }
     else{
       print('GetMyReservations : Error');

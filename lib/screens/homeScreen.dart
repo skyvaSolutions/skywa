@@ -238,6 +238,7 @@ class HomeBar extends StatelessWidget {
             child: BusinessWidget(
               name: nearbyQs[index].companyName,
               address: nearbyQs[index].address,
+              index: index,
             ),
           );
         });

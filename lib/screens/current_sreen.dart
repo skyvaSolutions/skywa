@@ -9,21 +9,48 @@ import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/api_responses/reservations.dart';
+import 'package:skywa/components/current_screen__circlular_buttons.dart';
+import 'package:skywa/components/questionnaire_one.dart';
+import 'package:skywa/model/reservation.dart';
 import 'package:skywa/screens/appointment_status.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
+import 'package:skywa/screens/questionairre_screen.dart';
+
+
+bool isReservationToday = false;
+bool showFooter = false;
+bool customQuestionnaireVisited = false;
 
 Future<void> getAndSortReservations() async {
   await getMyReservations.findReservations();
+  List<Reservation> todayRes = [];
   if (myReservations.noReservations == false) {
-    myReservations.reservationsList.sort((res1, res2) =>
-        convertDateFromString(res1.ReservationStartTime)
-            .compareTo(convertDateFromString(res2.ReservationStartTime)));
-    print(myReservations.reservationsList[0].ReservationStartTime);
-    currentReservation.CurrentReservationId =
-        myReservations.reservationsList[0].ReservationID;
-    currentReservation.QId = myReservations.reservationsList[0].QID;
-    await getSingleReservation.getCurrentReservation();
+    for(int i =0;i<myReservations.reservationsList.length ; i++){
+      DateTime today = DateTime.now();
+      int todayDay = today.day;
+      int todayMonth = today.month;
+      int todayYear = today.year;
+      DateTime reservationTime = convertDateFromString(myReservations.reservationsList[i].ReservationStartTime);
+      int resDay = reservationTime.day;
+      int resMonth = reservationTime.month;
+      int resYear = reservationTime.year;
+      if(resDay == todayDay && resMonth == todayMonth && resYear == todayYear){
+        todayRes.add(myReservations.reservationsList[i]);
+      }
+
+    }
+    if(todayRes.length >=1){
+      isReservationToday = true;
+      todayRes.sort((res1, res2) =>
+          convertDateFromString(res1.ReservationStartTime)
+              .compareTo(convertDateFromString(res2.ReservationStartTime)));
+      print(todayRes[0].ReservationStartTime);
+      currentReservation.CurrentReservationId =
+          todayRes[0].ReservationID;
+      currentReservation.QId = todayRes[0].QID;
+      await getSingleReservation.getCurrentReservation();
+    }
   }
 }
 
@@ -65,7 +92,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
             if (snapshot.hasError) {
               return Center(child: Text(snapshot.error));
             } else {
-              if (myReservations.noReservations == true) {
+              if (myReservations.noReservations == true || isReservationToday == false) {
                 return Container(
                   alignment: Alignment.center,
                   child: Column(
@@ -130,7 +157,12 @@ class _CurrentScreenState extends State<CurrentScreen> {
   }
 }
 
-class UpperContainer extends StatelessWidget {
+class UpperContainer extends StatefulWidget {
+  @override
+  _UpperContainerState createState() => _UpperContainerState();
+}
+
+class _UpperContainerState extends State<UpperContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -154,7 +186,12 @@ class UpperContainer extends StatelessWidget {
   }
 }
 
-class Header extends StatelessWidget {
+class Header extends StatefulWidget {
+  @override
+  _HeaderState createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -209,12 +246,21 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
   Widget build(BuildContext context) {
     DateTime dateCon = convertDateFromString(
         currentReservation.currentRes.ReservationStartTime);
-    String date = dateCon.day.toString() +
-        "-" +
-        dateCon.month.toString() +
-        "-" +
-        dateCon.year.toString();
-    String time = dateCon.hour.toString() + ":" + dateCon.minute.toString();
+
+    int resDay = dateCon.day;
+    int resMonth = dateCon.month;
+    int resHour = dateCon.hour;
+    int resMin = dateCon.minute;
+
+    String resDayStr = resDay < 10 ? "0"+ resDay.toString() : resDay.toString();
+    String resMonthStr = resMonth < 10 ? "0"+ resMonth.toString() : resMonth.toString();
+
+    String resHourStr = resHour < 10 ? "0" + resHour.toString() : resHour.toString();
+    String resMinStr = resMin < 10 ? "0" + resMin.toString() : resMin.toString();
+
+    String date = resDayStr + "-" + resMonthStr + "-" + dateCon.year.toString();
+    String time = resHourStr+ ":" + resMinStr;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -236,7 +282,13 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
   }
 }
 
-class Footer extends StatelessWidget {
+
+class Footer extends StatefulWidget {
+  @override
+  _FooterState createState() => _FooterState();
+}
+
+class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -245,165 +297,34 @@ class Footer extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 4,
-                      offset: Offset(3, 3),
-                    ),
-                  ],
-                  color: Theme.of(context).primaryColor,
-                ),
-                width: 60.0,
-                height: 60.0,
-                child: Center(
-                  child: IconButton(
-                    icon: Icon(Icons.info),
-                    iconSize: 30.0,
-                    color: Colors.white,
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: 100.0,
-                child: Text(
-                  'Information about Appointment',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ],
+          CircularIconButtons(
+            bg: Theme.of(context).primaryColor,
+            icon: Icons.info,
+            text: 'Information about Appointment',
+            onPressed: (){},
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 4,
-                      offset: Offset(3, 3),
-                    ),
-                  ],
-                  color: Theme.of(context).primaryColor,
-                ),
-                width: 60.0,
-                height: 60.0,
-                child: Center(
-                  child: IconButton(
-                    icon: Icon(Icons.question_answer),
-                    iconSize: 30.0,
-                    color: Colors.white,
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: 100.0,
-                child: Text(
-                  'Complete Questionnaire',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-              ),
-            ],
+          CircularIconButtons(
+            bg: customQuestionnaireVisited ? Theme.of(context).primaryColor : Colors.redAccent,
+            icon: Icons.question_answer,
+            text : 'Complete Questionnaire',
+            onPressed: () {
+              setState(() {
+                customQuestionnaireVisited = true;
+              });
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuestionnairePage(pageNum: 0,)));
+            },
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 4,
-                      offset: Offset(3, 3),
-                    ),
-                  ],
-                  color: Theme.of(context).primaryColor,
-                ),
-                width: 60.0,
-                height: 60.0,
-                child: Center(
-                  child: IconButton(
-                    icon: Icon(Icons.chat),
-                    iconSize: 30.0,
-                    color: Colors.white,
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: 100.0,
-                child: Text(
-                  'Chat with Business',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).primaryColor),
-                ),
-              ),
-            ],
+          CircularIconButtons(
+            bg: Colors.grey[400],
+            icon: Icons.chat,
+            text : 'Chat with Business',
+            onPressed: (){},
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
-                      blurRadius: 4,
-                      offset: Offset(3, 3),
-                    ),
-                  ],
-                  color: Theme.of(context).primaryColor,
-                ),
-                width: 60.0,
-                height: 60.0,
-                child: Center(
-                  child: IconButton(
-                    icon: Icon(Icons.call),
-                    iconSize: 30.0,
-                    color: Colors.white,
-                    onPressed: () {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              Container(
-                width: 100.0,
-                child: Text(
-                  'Call Business',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ],
+          CircularIconButtons(
+            bg: Theme.of(context).primaryColor,
+            icon: Icons.phone_in_talk,
+            text: 'Call Business',
+            onPressed: (){},
           ),
         ],
       ),

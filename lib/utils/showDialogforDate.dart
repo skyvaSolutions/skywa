@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/createReservationProvider.dart';
 
-Future<void> showDialogForDate(context, name) async {
+Future<void> showDialogForDate(context, name , index) async {
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
   TextEditingController _timeController = TextEditingController();
 
@@ -75,7 +75,7 @@ Future<void> showDialogForDate(context, name) async {
               style: GoogleFonts.poppins(),
             ),
             onPressed: () {
-              p.createReservation(_timeController.text, name);
+              p.createReservation(_timeController.text, name , index);
               Navigator.of(context).pop();
             },
           ),

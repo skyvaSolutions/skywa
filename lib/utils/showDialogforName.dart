@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:skywa/DB/DB.dart';
 import 'package:skywa/utils/showDialogforDate.dart';
 
-Future<void> showMyDialog(context, name) async {
+Future<void> showMyDialog(context, name , index) async {
   TextEditingController t1 = new TextEditingController();
   DB.box.get(DB.name) != null ? t1.text = DB.box.get(DB.name) : "";
   return showDialog<void>(
@@ -51,7 +51,7 @@ Future<void> showMyDialog(context, name) async {
             onPressed: () {
               DB.box.put(DB.name, t1.text);
               Navigator.of(context).pop();
-              showDialogForDate(context, name);
+              showDialogForDate(context, name , index);
             },
           ),
         ],

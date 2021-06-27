@@ -30,7 +30,7 @@ DateTime convertDateFromString(String strDate){
   return dob;
 }
 
-void callApis(BuildContext context , Map<String , String> formValues) async {
+Future<void> callApis(BuildContext context , Map<String , String> formValues) async {
   await addUser.addNewUser(formValues);
   await findUsers.returnPerson(context);
 }
@@ -46,8 +46,6 @@ class ProfileEditPage extends StatefulWidget {
   _ProfileEditPageState createState() => _ProfileEditPageState();
 }
 
-
-
 class _ProfileEditPageState extends State<ProfileEditPage> {
   void getLocation() async {
     Location l = new Location();
@@ -55,13 +53,12 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     _formKey.currentState.patchValue({"Address": l.location});
   }
 
-
+  final _formKey = GlobalKey<FormBuilderState>();
   final nameHolder = TextEditingController(text: getPerson.fetchedVal['fullName']);
   final emailHolder = TextEditingController(text : getPerson.fetchedVal['email']);
   final addressHolder = TextEditingController(text : getPerson.fetchedVal['address']);
 
 
-  final _formKey = GlobalKey<FormBuilderState>();
   File _image;
   final picker = ImagePicker();
 
@@ -244,106 +241,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10))),
                       onPressed: () {
-                        _formKey.currentState.save();
-                        if (_formKey.currentState.validate()) {
-                          print(_formKey.currentState.value);
-                          print(_formKey.currentState.value["Email"].isEmpty);
-
-                          Map<String , String> formValues  = new Map();
-                          String PersonID;
-                          if(getPerson.isPersonRegistered){
-                            PersonID = getPerson.person.PersonID;
-                          }
-                          else{
-                            PersonID = uuid.v4();
-                          }
-                          print(PersonID);
-                          formValues['PersonID'] = PersonID;
-                          formValues['PersonType'] = 'Self';
-                          formValues['RecordOwnerDeviceID'] = userSettings.deviceID.value;
-                          formValues['DeviceID'] = userSettings.deviceID.value;
-                          if(_formKey.currentState.value["Name"] != null){
-                            List<String> fullName = _formKey.currentState.value["Name"].split(' ');
-                            print(fullName.length);
-                            if(fullName.length == 3){
-                              if(fullName[0] != ''){
-                                formValues['FirstName'] = fullName[0];
-                              }
-                              else{
-                                formValues['FirstName'] = "notSet";
-                              }
-                              if(fullName[1] != ''){
-                                formValues['MiddleName'] = fullName[1];
-                              }
-                              else{
-                                formValues['MiddleName'] = "notSet";
-                              }
-                              if(fullName[2] != ''){
-                                formValues['LastName'] = fullName[2];
-                              }
-                              else{
-                                formValues['LastName'] = "notSet" ;
-                              }
-                            }
-                            else if(fullName.length == 2){
-                              if(fullName[0] != ''){
-                                formValues['FirstName'] = fullName[0];
-                              }
-                              else{
-                                formValues['FirstName'] = "notSet";
-                              }
-                              if(fullName[1] != ''){
-                                formValues['LastName'] = fullName[1];
-                              }
-                              else{
-                                formValues['LastName'] = "notSet" ;
-                              }
-                              formValues['MiddleName'] = "notSet";
-                            }
-                            else{
-                              if(fullName[0] != ''){
-                                formValues['FirstName'] = fullName[0];
-                              }
-                              else{
-                                formValues['FirstName'] = "notSet" ;
-                              }
-                              formValues['MiddleName'] = "notSet";
-                              formValues['LastName'] = "notSet";
-                            }
-
-                          }
-                          if(_formKey.currentState.value["Gender"] != null){
-                            formValues['Sex'] = _formKey.currentState.value["Gender"];
-                          }
-                          else{
-                            formValues['Sex'] = "notSet" ;
-                          }
-                          if(_formKey.currentState.value["Address"] != null){
-                            formValues['Address'] = _formKey.currentState.value["Address"];
-                          }
-                          else{
-                            formValues['Address'] = "notSet" ;
-                          }
-                          if(_formKey.currentState.value["Email"] != null){
-                            formValues['PersonEmail'] = _formKey.currentState.value["Email"];
-                          }
-                          else{
-                            formValues['PersonEmail'] = "notSet" ;
-                          }
-                          if(_formKey.currentState.value["DateOfBirth"] != null){
-                            formValues['Birthday'] = _formKey.currentState.value["DateOfBirth"].toString();
-                          }
-                          else{
-                            formValues['Birthday'] = "notSet" ;
-                          }
-
-///////////////////////////// again call the two apis for adding and updating/////////////////////////////////////
-                          callApis(context , formValues);
-
-
-
-
-                        }
+                        onSavePressed(_formKey , context);
                       },
                       child: Text(
                         "Save",
@@ -374,5 +272,110 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         ),
       ),
     );
+  }
+}
+
+
+
+void onSavePressed(_formKey , BuildContext context){
+  _formKey.currentState.save();
+  if (_formKey.currentState.validate()) {
+    print(_formKey.currentState.value);
+    Map<String , String> formValues  = new Map();
+    String PersonID;
+    if(getPerson.isPersonRegistered){
+      PersonID = getPerson.person.PersonID;
+    }
+    else{
+      PersonID = uuid.v4();
+    }
+    //print(PersonID);
+    if(_formKey.currentState.value.containsKey('Phone Number') && _formKey.currentState.value['Phone Number'] != null){
+      formValues['PersonPhoneNumber'] = _formKey.currentState.value['Phone Number'];
+    }
+    formValues['PersonID'] = PersonID;
+    formValues['PersonType'] = 'Self';
+    formValues['RecordOwnerDeviceID'] = userSettings.deviceID.value;
+    formValues['DeviceID'] = userSettings.deviceID.value;
+    if(_formKey.currentState.value["Name"] != null){
+      List<String> fullName = _formKey.currentState.value["Name"].split(' ');
+      print(fullName.length);
+      if(fullName.length == 3){
+        if(fullName[0] != ''){
+          formValues['FirstName'] = fullName[0];
+        }
+        else{
+          formValues['FirstName'] = "notSet";
+        }
+        if(fullName[1] != ''){
+          formValues['MiddleName'] = fullName[1];
+        }
+        else{
+          formValues['MiddleName'] = "notSet";
+        }
+        if(fullName[2] != ''){
+          formValues['LastName'] = fullName[2];
+        }
+        else{
+          formValues['LastName'] = "notSet" ;
+        }
+      }
+      else if(fullName.length == 2){
+        if(fullName[0] != ''){
+          formValues['FirstName'] = fullName[0];
+        }
+        else{
+          formValues['FirstName'] = "notSet";
+        }
+        if(fullName[1] != ''){
+          formValues['LastName'] = fullName[1];
+        }
+        else{
+          formValues['LastName'] = "notSet" ;
+        }
+        formValues['MiddleName'] = "notSet";
+      }
+      else{
+        if(fullName[0] != ''){
+          formValues['FirstName'] = fullName[0];
+        }
+        else{
+          formValues['FirstName'] = "notSet" ;
+        }
+        formValues['MiddleName'] = "notSet";
+        formValues['LastName'] = "notSet";
+      }
+
+    }
+    if(_formKey.currentState.value["Gender"] != null){
+      formValues['Sex'] = _formKey.currentState.value["Gender"];
+    }
+    else{
+      formValues['Sex'] = "notSet" ;
+    }
+    if(_formKey.currentState.value["Address"] != null){
+      formValues['Address'] = _formKey.currentState.value["Address"];
+    }
+    else{
+      formValues['Address'] = "notSet" ;
+    }
+    if(_formKey.currentState.value["Email"] != null){
+      formValues['PersonEmail'] = _formKey.currentState.value["Email"];
+    }
+    else{
+      formValues['PersonEmail'] = "notSet" ;
+    }
+    if(_formKey.currentState.value["DateOfBirth"] != null){
+      formValues['Birthday'] = _formKey.currentState.value["DateOfBirth"].toString();
+    }
+    else{
+      formValues['Birthday'] = "notSet" ;
+    }
+
+///////////////////////////// again call the two apis for adding and updating/////////////////////////////////////
+    callApis(context , formValues);
+
+
+
   }
 }

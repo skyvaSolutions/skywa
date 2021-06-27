@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
-  final name, address;
-  const BusinessWidget({Key key, this.name, this.address}) : super(key: key);
+  final name, address , index;
+  const BusinessWidget({Key key, this.name, this.address , this.index}) : super(key: key);
   @override
   _BusinessWidgetState createState() => _BusinessWidgetState();
 }
@@ -118,7 +118,7 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () async {
-                        await showMyDialog(context, widget.name.toString());
+                        await showMyDialog(context, widget.name.toString() , widget.index);
                       },
                       child: Text("Check In"),
                     )

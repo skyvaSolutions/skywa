@@ -38,7 +38,7 @@ class FindUsers{
   }
 
 
-  void returnPerson(BuildContext context) async {
+  Future<void> returnPerson(BuildContext context) async {
     Person person = await FindUsers().findPersonRegistered(context);
     if(getPerson.isPersonRegistered)
       getPerson.person = person;
@@ -63,6 +63,8 @@ class FindUsers{
         fetchedValues['dob'] = getPerson.person.Birthday;
       if(getPerson.person.Sex != "notSet")
         fetchedValues['gender'] = getPerson.person.Sex;
+      if(getPerson.person.PersonPhoneNumber != "notSet")
+        fetchedValues['phoneNumber'] = getPerson.person.PersonPhoneNumber;
     }
     else{
       fetchedValues['fullName'] = null;
@@ -70,6 +72,7 @@ class FindUsers{
       fetchedValues['address'] = null;
       fetchedValues['dob'] = null;
       fetchedValues['gender'] = null;
+      fetchedValues['phoneNumber'] = null;
     }
     return fetchedValues;
   }

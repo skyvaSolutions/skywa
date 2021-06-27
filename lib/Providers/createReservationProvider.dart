@@ -1,12 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
+import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/services/locationServices.dart';
 import 'package:uuid/uuid.dart';
 import 'package:dio/dio.dart';
 
 class createReservationProvider with ChangeNotifier {
-  void createReservation(String date, String CompanyName) async {
+  void createReservation(String date, String CompanyName , int index) async {
     var uuid = Uuid();
     String deviceId = userSettings.deviceID.value;
     String startTime = DateTime.now().toString();
@@ -23,20 +24,20 @@ class createReservationProvider with ChangeNotifier {
       "ReservationStartTime": startTime,
       "Latitude": lat.toString(),
       "Longitude": long.toString(),
-      "QID": resId,
-      "QJoinTime": "notSet",
-      "OriginalETA": "notSet",
-      "LatestETA": "notSet",
-      "MemberQueuePosition": "notSet",
+      "QID": nearbyQs[index].qid,
+      // "QJoinTime": "notSet",
+      // "OriginalETA": "notSet",
+      // "LatestETA": "notSet",
+      // "MemberQueuePosition": "notSet",
       "LastReportedLocationTimeStamp": startTime,
-      "LastReportedLocationAccuracy": "notSet",
-      "NoShowCount": "notSet",
+      // "LastReportedLocationAccuracy": "notSet",
+      // "NoShowCount": "notSet",
       "MemberStateUpdateTimeStamp": startTime,
       "WaitTime": 10,
       "ReservationType": "Vax",
       "PhoneNumber": "+1 242-302-4710",
       "NumberOfPeopleOnReservation": "1",
-      "ReservationCreatedTimeStamp": "notSet",
+      // "ReservationCreatedTimeStamp": "notSet",
       "ReservationUpdatedTimeStamp": "2021-06-17T22:17:54.000Z",
       "LocationName": CompanyName,
       "Address": " 17 Blake Rd, Nassau, Bahamas",

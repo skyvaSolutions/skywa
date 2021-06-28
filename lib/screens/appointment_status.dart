@@ -117,361 +117,253 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
   @override
   void initState() {
     super.initState();
-    if (currentReservation.currentRes.MemberState == "Arrived")
-      setUpTimedFetch();
-    if (currentReservation.currentRes.MemberState == "Not Arrived")
-      setUpTimedDistanceFetch();
+    // if (currentReservation.currentRes.MemberState == "Arrived")
+    //   setUpTimedFetch();
+    // if (currentReservation.currentRes.MemberState == "Not Arrived")
+    //   setUpTimedDistanceFetch();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (context.read<MemberStateChanged>().statusIndex != 1)
-                ElevatedButton(
-                  onPressed: () {
-                    MapUtils.openMap(31.968599, -99.901810);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.directions,
-                        color: Colors.white,
-                        size: 20.0,
-                      ),
-                      SizedBox(
-                        width: 8.0,
-                      ),
-                      Text(
-                        'Directions',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor)),
+    return Center(
+      child: Column(
+        children: [
+          //ButtonRow(),
+          if (currentReservation.currentRes.MemberState == "Arrived")
+            Container(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Expected Wait : ' +
+                    currentReservation.currentRes.WaitTime.toString() +
+                    " minutes",
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          SizedBox(
+            height: 20.0,
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.15,
+            child: Timeline.tileBuilder(
+              theme: TimelineThemeData(
+                direction: Axis.horizontal,
+                connectorTheme: ConnectorThemeData(
+                  space: 30.0,
+                  thickness: 5.0,
                 ),
-              if (currentReservation.currentRes.MemberState == "Arrived")
+              ),
+              builder: TimelineTileBuilder.connected(
+                connectionDirection: ConnectionDirection.before,
+                itemExtentBuilder: (_, __) =>
+                    MediaQuery.of(context).size.width / _processes.length,
+                oppositeContentsBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Icon(
+                      timelineIcons[index],
+                      color: getColor(index),
+                      size: 30.0,
+                    ),
+                  );
+                },
+                contentsBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Text(
+                      _processes[index],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: getColor(index),
+                      ),
+                    ),
+                  );
+                },
+                indicatorBuilder: (_, index) {
+                  var color;
+                  var child;
+                  if (index == context.read<MemberStateChanged>().statusIndex) {
+                    color = inProgressColor;
+                  } else if (index <
+                      context.read<MemberStateChanged>().statusIndex) {
+                    color = completeColor;
+                  } else {
+                    color = todoColor;
+                  }
+
+                  if (index <= context.read<MemberStateChanged>().statusIndex) {
+                    return Stack(
+                      children: [
+                        DotIndicator(
+                          size: 15.0,
+                          color: color,
+                          child: child,
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Stack(
+                      children: [
+                        OutlinedDotIndicator(
+                          borderWidth: 4.0,
+                          color: color,
+                        ),
+                      ],
+                    );
+                  }
+                },
+                connectorBuilder: (_, index, type) {
+                  if (index > 0) {
+                    if (index == context.read<MemberStateChanged>().statusIndex) {
+                      final prevColor = getColor(index - 1);
+                      final color = getColor(index);
+                      List<Color> gradientColors;
+                      if (type == ConnectorType.start) {
+                        gradientColors = [
+                          Color.lerp(prevColor, color, 0.5),
+                          color
+                        ];
+                      } else {
+                        gradientColors = [
+                          prevColor,
+                          Color.lerp(prevColor, color, 0.5)
+                        ];
+                      }
+                      return DecoratedLineConnector(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: gradientColors,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return SolidLineConnector(
+                        color: getColor(index),
+                      );
+                    }
+                  } else {
+                    return null;
+                  }
+                },
+                itemCount: _processes.length,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              children: [
                 Container(
                   padding: EdgeInsets.all(8.0),
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
+                    ),
+                    color: Color(0xFFFFA63C),
+                  ),
                   child: Text(
-                    'Expected Wait : ' +
-                        currentReservation.currentRes.WaitTime.toString() +
-                        " minutes",
+                    statusMess[context.read<MemberStateChanged>().statusIndex],
                     style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 16.0,
+                        fontSize: 15.0,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
-              ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          content: Container(
-                            padding: EdgeInsets.all(10.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.warning_amber_rounded,
-                                  size: 50.0,
-                                  color: Colors.redAccent,
-                                ),
-                                SizedBox(
-                                  height: 20.0,
-                                ),
-                                Text(
-                                  'Delete Reservation',
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[850],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 8.0,
-                                ),
-                                Text(
-                                  'Are you sure you want to permanently delete this Reservation.',
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.grey[800],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          titlePadding: EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 20.0),
-                          contentPadding: EdgeInsets.all(10.0),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text('Cancel'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await deleteReservation.deleteRes();
-                                setState(() {});
-                              },
-                              child: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all(Colors.redAccent),
-                              ),
-                            )
-                          ],
-                        );
-                      });
-                },
-                child: Row(
+                SizedBox(
+                  height: 20.0,
+                ),
+                //if (context.read<MemberStateChanged>().statusIndex == 0)
+                Column(
                   children: [
-                    Icon(
-                      Icons.cancel,
-                      color: Colors.white,
-                      size: 20.0,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.place,
+                          color: Theme.of(context).primaryColor,
+                          size: 30.0,
+                        ),
+                        SizedBox(
+                          width: 10.0,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width*0.6,
+                          child: Text(
+                            'Reached the business but appointment status is not updated. Manually update the status.',
+                            textAlign: TextAlign.justify,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20.0,
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            print(currentReservation.currentRes.DevideID);
+                            Map<String, dynamic> reservationValues = resObject();
+                            await addUpdateReservation
+                                .addUpdateRes(reservationValues);
+                            await getSingleReservation.getCurrentReservation();
+                            if (currentReservation.currentRes.MemberState ==
+                                "Arrived")
+                              Provider.of<MemberStateChanged>(context, listen: false)
+                                  .changeStatusIndex(1);
+                            setState(() {});
+                          },
+                          child: Text(
+                            'Arrived',
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      width: 8.0,
-                    ),
-                    Text(
-                      'Cancel',
-                    ),
+                    // TextButton(
+                    //   onPressed: () {},
+                    //   style: ButtonStyle(
+                    //     backgroundColor: MaterialStateProperty.all(
+                    //         Colors.grey[400]),
+                    //     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    //       RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(4.0),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     'Running Late',
+                    //     style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.white,
+                    //     ),
+                    //   ),
+                    // ),
+                    // TextButton(
+                    //   onPressed: () {},
+                    //   style: ButtonStyle(
+                    //     backgroundColor: MaterialStateProperty.all(
+                    //         Colors.grey[400]),
+                    //     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    //       RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(4.0),
+                    //       ),
+                    //     ),
+                    //   ),
+                    //   child: Text(
+                    //     'Available Early',
+                    //     style: TextStyle(
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.white
+                    //     ),
+                    //   ),
+                    // )
                   ],
-                ),
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.redAccent)),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: 20.0,
-        ),
-        Container(
-          height: MediaQuery.of(context).size.height * 0.15,
-          child: Timeline.tileBuilder(
-            theme: TimelineThemeData(
-              direction: Axis.horizontal,
-              connectorTheme: ConnectorThemeData(
-                space: 30.0,
-                thickness: 5.0,
-              ),
+                )
+              ],
             ),
-            builder: TimelineTileBuilder.connected(
-              connectionDirection: ConnectionDirection.before,
-              itemExtentBuilder: (_, __) =>
-                  MediaQuery.of(context).size.width / _processes.length,
-              oppositeContentsBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Icon(
-                    timelineIcons[index],
-                    color: getColor(index),
-                    size: 30.0,
-                  ),
-                );
-              },
-              contentsBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 10.0),
-                  child: Text(
-                    _processes[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: getColor(index),
-                    ),
-                  ),
-                );
-              },
-              indicatorBuilder: (_, index) {
-                var color;
-                var child;
-                if (index == context.read<MemberStateChanged>().statusIndex) {
-                  color = inProgressColor;
-                } else if (index <
-                    context.read<MemberStateChanged>().statusIndex) {
-                  color = completeColor;
-                } else {
-                  color = todoColor;
-                }
-
-                if (index <= context.read<MemberStateChanged>().statusIndex) {
-                  return Stack(
-                    children: [
-                      DotIndicator(
-                        size: 15.0,
-                        color: color,
-                        child: child,
-                      ),
-                    ],
-                  );
-                } else {
-                  return Stack(
-                    children: [
-                      OutlinedDotIndicator(
-                        borderWidth: 4.0,
-                        color: color,
-                      ),
-                    ],
-                  );
-                }
-              },
-              connectorBuilder: (_, index, type) {
-                if (index > 0) {
-                  if (index == context.read<MemberStateChanged>().statusIndex) {
-                    final prevColor = getColor(index - 1);
-                    final color = getColor(index);
-                    List<Color> gradientColors;
-                    if (type == ConnectorType.start) {
-                      gradientColors = [
-                        Color.lerp(prevColor, color, 0.5),
-                        color
-                      ];
-                    } else {
-                      gradientColors = [
-                        prevColor,
-                        Color.lerp(prevColor, color, 0.5)
-                      ];
-                    }
-                    return DecoratedLineConnector(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: gradientColors,
-                        ),
-                      ),
-                    );
-                  } else {
-                    return SolidLineConnector(
-                      color: getColor(index),
-                    );
-                  }
-                } else {
-                  return null;
-                }
-              },
-              itemCount: _processes.length,
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.all(8.0),
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(10.0),
-                  ),
-                  color: Color(0xFFFFA63C),
-                ),
-                child: Text(
-                  statusMess[context.read<MemberStateChanged>().statusIndex],
-                  style: TextStyle(
-                      fontSize: 15.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              if (context.read<MemberStateChanged>().statusIndex == 0)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () async {
-                      print(currentReservation.currentRes.DevideID);
-                      Map<String, dynamic> reservationValues = resObject();
-                      await addUpdateReservation
-                          .addUpdateRes(reservationValues);
-                      await getSingleReservation.getCurrentReservation();
-                      if (currentReservation.currentRes.MemberState ==
-                          "Arrived")
-                        Provider.of<MemberStateChanged>(context, listen: false)
-                            .changeStatusIndex(1);
-                      setState(() {});
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).primaryColor),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'Arrived',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Colors.grey[400]),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'Running Late',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Colors.grey[400]),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                      ),
-                    ),
-                    child: Text(
-                      'Available Early',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white
-                      ),
-                    ),
-                  )
-                ],
-              )
-            ],
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }
@@ -489,6 +381,116 @@ final statusMess = [
   'We are ready for you please walk to the entrance.',
   'Your appointment is in progress.',
 ];
+
+class ButtonRow extends StatefulWidget {
+  const ButtonRow({Key key}) : super(key: key);
+
+  @override
+  _ButtonRowState createState() => _ButtonRowState();
+}
+
+class _ButtonRowState extends State<ButtonRow> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (context.read<MemberStateChanged>().statusIndex != 1)
+            IconButton(
+              onPressed: () {
+                MapUtils.openMap(31.968599, -99.901810);
+              },
+              icon: Icon(Icons.directions),
+              iconSize: 30.0,
+              color: Theme.of(context).primaryColor,
+
+            ),
+          ElevatedButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      content: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              size: 50.0,
+                              color: Colors.redAccent,
+                            ),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            Text(
+                              'Delete Reservation',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[850],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 8.0,
+                            ),
+                            Text(
+                              'Are you sure you want to permanently delete this Reservation.',
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                color: Colors.grey[800],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      titlePadding: EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 20.0),
+                      contentPadding: EdgeInsets.all(10.0),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await deleteReservation.deleteRes();
+                            setState(() {});
+                          },
+                          child: Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                            MaterialStateProperty.all(Colors.redAccent),
+                          ),
+                        )
+                      ],
+                    );
+                  });
+            },
+            child: Text(
+                  'Cancel',
+                ),
+            style: ButtonStyle(
+                backgroundColor:
+                MaterialStateProperty.all(Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 
 //Color(0xff5ec792);
 //Color(0xff878890);

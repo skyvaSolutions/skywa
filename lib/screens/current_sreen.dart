@@ -122,24 +122,21 @@ class _CurrentScreenState extends State<CurrentScreen> {
                     ChangeNotifierProvider<MemberStateChanged>(
                         create: (context) => MemberStateChanged()),
                   ],
-                  child: Container(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                            child: Column(
-                          children: [
-                            UpperContainer(),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Center(child: AppointmentStatus()),
-                          ],
-                        )),
-                        Footer(),
-                      ],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          Header(),
+                          SizedBox(
+                            height: 10.0,
+                          ),
+                          AppointmentStatus(),
+                        ],
+                      ),
+                      Footer(),
+                    ],
                   ),
                 );
               } else
@@ -194,44 +191,50 @@ class Header extends StatefulWidget {
 class _HeaderState extends State<Header> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 80.0,
-                width: 80.0,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                    image: DecorationImage(
-                        scale: 1,
-                        image: NetworkImage(
-                            "https://image.shutterstock.com/image-vector/medical-care-logo-design-260nw-1281695074.jpg"),
-                        fit: BoxFit.scaleDown)),
-              ),
-              SizedBox(
-                height: 8.0,
-              ),
-              Text(
-                currentReservation.currentRes.CompanyName,
-                style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-            ],
-          ),
-          AppointmentDateTime(),
-        ],
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              height: 80.0,
+              width: 80.0,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(100),
+                  image: DecorationImage(
+                      scale: 1,
+                      image: NetworkImage(
+                          "https://image.shutterstock.com/image-vector/medical-care-logo-design-260nw-1281695074.jpg"),
+                      fit: BoxFit.scaleDown)),
+            ),
+            SizedBox(
+              width: 10.0,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 8.0,
+                ),
+                Text(
+                  currentReservation.currentRes.CompanyName,
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).primaryColor),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                AppointmentDateTime(),
+              ],
+            ),
+          ],
+        ),
+        ButtonRow(),
+      ],
     );
   }
 }
@@ -262,12 +265,12 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
     String time = resHourStr+ ":" + resMinStr;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Date : $date',
           style: TextStyle(
-              fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 15.0, fontWeight: FontWeight.bold,),
         ),
         SizedBox(
           height: 10.0,
@@ -275,7 +278,7 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
         Text(
           'Time : $time',
           style: TextStyle(
-              fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 15.0, fontWeight: FontWeight.bold, ),
         ),
       ],
     );
@@ -291,14 +294,63 @@ class Footer extends StatefulWidget {
 class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0 , vertical: 20.0),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+      width: double.maxFinite,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(10.0),
+        ),
+        color : Theme.of(context).primaryColor
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircularIconButtons(
-            bg: Theme.of(context).primaryColor,
+          IconButton(onPressed: (){}, icon: Icon(Icons.info) , color: Colors.white,),
+          Container(
+            height: 50.0,
+            width: 2.0,
+            color:Colors.white,
+          ),
+          IconButton(onPressed: (){
+            setState(() {
+              customQuestionnaireVisited = true;
+            });
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuestionnairePage(pageNum: 0,)));
+          }, icon: Text(
+            'Q/A' ,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 17.5,
+            ),
+          ),
+          ),
+          Container(
+            height: 50.0,
+            width: 2.0,
+            color: Colors.white,
+          ),
+          IconButton(onPressed: (){}, icon: Icon(Icons.chat) , color:Colors.white,),
+          Container(
+            height: 50.0,
+            width: 2.0,
+            color:Colors.white,
+          ),
+          IconButton(onPressed: (){}, icon: Icon(Icons.phone_in_talk) , color: Colors.white,)
+        ],
+      ),
+    );
+  }
+}
+
+
+/*
+*
+*
+* CircularIconButtons(
+            bg: Colors.white,
             icon: Icons.info,
             text: 'Information about Appointment',
             onPressed: (){},
@@ -325,9 +377,4 @@ class _FooterState extends State<Footer> {
             icon: Icons.phone_in_talk,
             text: 'Call Business',
             onPressed: (){},
-          ),
-        ],
-      ),
-    );
-  }
-}
+          ),*/

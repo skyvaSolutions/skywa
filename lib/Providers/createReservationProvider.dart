@@ -21,7 +21,7 @@ class createReservationProvider with ChangeNotifier {
       "DeviceID": deviceId,
       "MemberState": "Not Arrived",
       "ReservationID": resId,
-      "ReservationStartTime": startTime,
+      "ReservationStartTime": date,
       "Latitude": lat.toString(),
       "Longitude": long.toString(),
       "QID": nearbyQs[index].qid,
@@ -44,13 +44,7 @@ class createReservationProvider with ChangeNotifier {
       "CompanyLogoURL": "DoctorsHospitalWest.jpg",
       "QName": "Main Entrance",
       "AuthorizedUsers": [],
-      "AttendeeData": [
-        {
-          "_id": "60cbd458e16a71374d19dd4a",
-          "FormDataID": uuid.v4(),
-          "PersonID": uuid.v4()
-        }
-      ],
+      "AttendeeData": [],
       "CompanyName": CompanyName
     };
     print(data);

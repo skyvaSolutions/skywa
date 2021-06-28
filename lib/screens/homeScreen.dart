@@ -15,6 +15,8 @@ import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
 import 'package:skywa/screens/appointment_status.dart';
 import 'package:skywa/screens/current_sreen.dart';
+import 'package:skywa/screens/Appointment.dart';
+import 'package:skywa/screens/CurrentBookings.dart';
 import 'package:skywa/screens/helpScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
@@ -26,23 +28,16 @@ import 'package:skywa/utils/Network_aware.dart';
 import 'package:http/http.dart' as http;
 import 'package:skywa/api_calls/find_users.dart';
 
-
-
 class HomeScreen extends StatefulWidget {
   static const String id = 'homeScreen';
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>{
+class _HomeScreenState extends State<HomeScreen> {
   int selectedPage = 0;
 
-
-  final _pageOptions = [
-    HomeBar(),
-    CurrentScreen(),
-    HomeBar()
-  ];
+  final _pageOptions = [HomeBar(), CurrentScreen(), HomeBar()];
   StreamSubscription _connectionChangeStream;
   FirebaseMessaging _messaging;
   int _totalNotifications = 0;
@@ -64,14 +59,11 @@ class _HomeScreenState extends State<HomeScreen>{
         _totalNotifications++;
       });
     });
-
   }
-
 
   Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     print("Handling a background message: ${message.messageId}");
   }
-
 
   void registerNotification() async {
     await Firebase.initializeApp();
@@ -149,8 +141,9 @@ class _HomeScreenState extends State<HomeScreen>{
     'Cook',
     'Carline'
   ];
+  int _selected = 0;
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
-
+  List<Widget> body = [HomeBar(), CurrentBookings(), Appointment()];
   Widget build(BuildContext context) {
     return Scaffold(
         // extendBodyBehindAppBar: true,
@@ -161,12 +154,12 @@ class _HomeScreenState extends State<HomeScreen>{
             style: GoogleFonts.poppins(),
           ),
           actions: [
-            if(selectedPage != 1)
-            IconButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, SearchPage.id);
-                },
-                icon: Icon(Icons.search))
+            if (selectedPage != 1)
+              IconButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, SearchPage.id);
+                  },
+                  icon: Icon(Icons.search))
           ],
 //        leading: IconButton(
 //          icon: Icon(Icons.help),
@@ -176,24 +169,30 @@ class _HomeScreenState extends State<HomeScreen>{
         ),
         drawer: AppDrawer(),
         bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            selectedLabelStyle: GoogleFonts.poppins(fontSize: 15),
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.list_alt),
-                label: 'Current Bookings',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_today),
-                label: 'Future Bookings',
-              )
-            ],
+          onTap: (e) {
+            setState(() {
+              _selected = e;
+            });
+          },
+          currentIndex: _selected,
+          type: BottomNavigationBarType.fixed,
+          selectedLabelStyle: GoogleFonts.poppins(fontSize: 15),
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Current Bookings',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'Appointments',
+            )
+          ],
           currentIndex: selectedPage,
-          onTap: (index){
+          onTap: (index) {
             setState(() {
               selectedPage = index;
             });
@@ -218,6 +217,7 @@ class _HomeScreenState extends State<HomeScreen>{
             //         ),
             //       );
             //     }),
+            onlineChild: body[_selected],
           ),
         ));
   }

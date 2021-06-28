@@ -17,7 +17,6 @@ import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
 import 'package:skywa/screens/questionairre_screen.dart';
 
-
 bool isReservationToday = false;
 bool showFooter = false;
 bool customQuestionnaireVisited = false;
@@ -26,28 +25,29 @@ Future<void> getAndSortReservations() async {
   await getMyReservations.findReservations();
   List<Reservation> todayRes = [];
   if (myReservations.noReservations == false) {
-    for(int i =0;i<myReservations.reservationsList.length ; i++){
+    for (int i = 0; i < myReservations.reservationsList.length; i++) {
       DateTime today = DateTime.now();
       int todayDay = today.day;
       int todayMonth = today.month;
       int todayYear = today.year;
-      DateTime reservationTime = convertDateFromString(myReservations.reservationsList[i].ReservationStartTime);
+      DateTime reservationTime = convertDateFromString(
+          myReservations.reservationsList[i].ReservationStartTime);
       int resDay = reservationTime.day;
       int resMonth = reservationTime.month;
       int resYear = reservationTime.year;
-      if(resDay == todayDay && resMonth == todayMonth && resYear == todayYear){
+      if (resDay == todayDay &&
+          resMonth == todayMonth &&
+          resYear == todayYear) {
         todayRes.add(myReservations.reservationsList[i]);
       }
-
     }
-    if(todayRes.length >=1){
+    if (todayRes.length >= 1) {
       isReservationToday = true;
       todayRes.sort((res1, res2) =>
           convertDateFromString(res1.ReservationStartTime)
               .compareTo(convertDateFromString(res2.ReservationStartTime)));
       print(todayRes[0].ReservationStartTime);
-      currentReservation.CurrentReservationId =
-          todayRes[0].ReservationID;
+      currentReservation.CurrentReservationId = todayRes[0].ReservationID;
       currentReservation.QId = todayRes[0].QID;
       await getSingleReservation.getCurrentReservation();
     }
@@ -90,9 +90,11 @@ class _CurrentScreenState extends State<CurrentScreen> {
             );
           } else {
             if (snapshot.hasError) {
-              return Center(child: Text(snapshot.error));
+              print(snapshot);
+              return Center(child: Text(snapshot.error.toString()));
             } else {
-              if (myReservations.noReservations == true || isReservationToday == false) {
+              if (myReservations.noReservations == true ||
+                  isReservationToday == false) {
                 return Container(
                   alignment: Alignment.center,
                   child: Column(
@@ -255,14 +257,18 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
     int resHour = dateCon.hour;
     int resMin = dateCon.minute;
 
-    String resDayStr = resDay < 10 ? "0"+ resDay.toString() : resDay.toString();
-    String resMonthStr = resMonth < 10 ? "0"+ resMonth.toString() : resMonth.toString();
+    String resDayStr =
+        resDay < 10 ? "0" + resDay.toString() : resDay.toString();
+    String resMonthStr =
+        resMonth < 10 ? "0" + resMonth.toString() : resMonth.toString();
 
-    String resHourStr = resHour < 10 ? "0" + resHour.toString() : resHour.toString();
-    String resMinStr = resMin < 10 ? "0" + resMin.toString() : resMin.toString();
+    String resHourStr =
+        resHour < 10 ? "0" + resHour.toString() : resHour.toString();
+    String resMinStr =
+        resMin < 10 ? "0" + resMin.toString() : resMin.toString();
 
     String date = resDayStr + "-" + resMonthStr + "-" + dateCon.year.toString();
-    String time = resHourStr+ ":" + resMinStr;
+    String time = resHourStr + ":" + resMinStr;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +276,9 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
         Text(
           'Date : $date',
           style: TextStyle(
-              fontSize: 15.0, fontWeight: FontWeight.bold,),
+            fontSize: 15.0,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         SizedBox(
           height: 10.0,
@@ -278,13 +286,14 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
         Text(
           'Time : $time',
           style: TextStyle(
-              fontSize: 15.0, fontWeight: FontWeight.bold, ),
+            fontSize: 15.0,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
   }
 }
-
 
 class Footer extends StatefulWidget {
   @override
@@ -298,53 +307,68 @@ class _FooterState extends State<Footer> {
       margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       width: double.maxFinite,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(10.0),
-        ),
-        color : Theme.of(context).primaryColor
-      ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(10.0),
+          ),
+          color: Theme.of(context).primaryColor),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.info) , color: Colors.white,),
-          Container(
-            height: 50.0,
-            width: 2.0,
-            color:Colors.white,
-          ),
-          IconButton(onPressed: (){
-            setState(() {
-              customQuestionnaireVisited = true;
-            });
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuestionnairePage(pageNum: 0,)));
-          }, icon: Text(
-            'Q/A' ,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 17.5,
-            ),
-          ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.info),
+            color: Colors.white,
           ),
           Container(
             height: 50.0,
             width: 2.0,
             color: Colors.white,
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.chat) , color:Colors.white,),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                customQuestionnaireVisited = true;
+              });
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => QuestionnairePage(
+                        pageNum: 0,
+                      )));
+            },
+            icon: Text(
+              'Q/A',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 17.5,
+              ),
+            ),
+          ),
           Container(
             height: 50.0,
             width: 2.0,
-            color:Colors.white,
+            color: Colors.white,
           ),
-          IconButton(onPressed: (){}, icon: Icon(Icons.phone_in_talk) , color: Colors.white,)
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.chat),
+            color: Colors.white,
+          ),
+          Container(
+            height: 50.0,
+            width: 2.0,
+            color: Colors.white,
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.phone_in_talk),
+            color: Colors.white,
+          )
         ],
       ),
     );
   }
 }
-
 
 /*
 *

@@ -18,6 +18,9 @@ class _AppointmentState extends State<Appointment> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: TabBar(
+            labelColor: Theme.of(context).primaryColor,
+            indicatorColor: Theme.of(context).primaryColor,
+            unselectedLabelColor: Theme.of(context).primaryColor,
             tabs: <Widget>[
               Tab(
                 text: "Upcoming",

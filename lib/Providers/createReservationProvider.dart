@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:dio/dio.dart';
 
 class createReservationProvider with ChangeNotifier {
-  void createReservation(String date, String CompanyName , int index) async {
+  void createReservation(String date, String CompanyName, int index) async {
     var uuid = Uuid();
     String deviceId = userSettings.deviceID.value;
     String startTime = DateTime.now().toString();
@@ -38,7 +38,6 @@ class createReservationProvider with ChangeNotifier {
       "PhoneNumber": "+1 242-302-4710",
       "NumberOfPeopleOnReservation": "1",
       // "ReservationCreatedTimeStamp": "notSet",
-      "ReservationUpdatedTimeStamp": "2021-06-17T22:17:54.000Z",
       "LocationName": CompanyName,
       "Address": " 17 Blake Rd, Nassau, Bahamas",
       "CompanyLogoURL": "DoctorsHospitalWest.jpg",

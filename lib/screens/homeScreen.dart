@@ -39,95 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _pageOptions = [HomeBar(), CurrentScreen(), HomeBar()];
   StreamSubscription _connectionChangeStream;
-  FirebaseMessaging _messaging;
-  int _totalNotifications = 0;
-  PushNotification _notificationInfo;
   @override
   void initState() {
     super.initState();
-    registerNotification();
-    checkForInitialMessage();
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      PushNotification notification = PushNotification(
-        title: message.notification?.title,
-        body: message.notification?.body,
-      );
-
-      setState(() {
-        _notificationInfo = notification;
-        _totalNotifications++;
-      });
-    });
-  }
-
-  Future _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-    print("Handling a background message: ${message.messageId}");
-  }
-
-  void registerNotification() async {
-    await Firebase.initializeApp();
-    _messaging = FirebaseMessaging.instance;
-
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    _messaging.getToken().then((value) => print(value));
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      provisional: false,
-      sound: true,
-    );
-
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('User granted permission');
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print(
-            'Message title: ${message.notification?.title}, body: ${message.notification?.body}, data: ${message.data}');
-
-        // Parse the message received
-        PushNotification notification = PushNotification(
-          title: message.notification?.title,
-          body: message.notification?.body,
-        );
-
-        setState(() {
-          _notificationInfo = notification;
-          _totalNotifications++;
-        });
-
-        if (_notificationInfo != null) {
-          // For displaying the notification as an overlay
-          showSimpleNotification(
-            Text(_notificationInfo.title),
-            leading: Text(_totalNotifications.toString()),
-            subtitle: Text(_notificationInfo.body),
-            background: Colors.cyan.shade700,
-            duration: Duration(seconds: 2),
-          );
-        }
-      });
-    } else {
-      print('User declined or has not accepted permission');
-    }
-  }
-
-  checkForInitialMessage() async {
-    await Firebase.initializeApp();
-    RemoteMessage initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
-
-    if (initialMessage != null) {
-      PushNotification notification = PushNotification(
-        title: initialMessage.notification?.title,
-        body: initialMessage.notification?.body,
-      );
-
-      setState(() {
-        _notificationInfo = notification;
-        _totalNotifications++;
-      });
-    }
   }
 
   @override
@@ -143,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   int _selected = 0;
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
-  List<Widget> body = [HomeBar(), CurrentBookings(), Appointment()];
+  List<Widget> body = [HomeBar(), CurrentScreen(), Appointment()];
   Widget build(BuildContext context) {
     return Scaffold(
         // extendBodyBehindAppBar: true,
@@ -191,19 +105,12 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Appointments',
             )
           ],
-          currentIndex: selectedPage,
-          onTap: (index) {
-            setState(() {
-              selectedPage = index;
-            });
-          },
         ),
         body: StreamProvider<NetworkStatus>(
           initialData: NetworkStatus.Online,
           create: (context) =>
               NetworkStatusService().networkStatusController.stream,
           child: NetworkAwareWidget(
-            onlineChild: _pageOptions[selectedPage],
             // onlineChild: ListView.builder(
             //     padding: const EdgeInsets.all(4),
             //     itemCount: nearbyQs.length,

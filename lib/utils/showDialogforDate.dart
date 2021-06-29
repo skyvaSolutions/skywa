@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/createReservationProvider.dart';
+import 'package:skywa/screens/current_sreen.dart';
+import 'package:skywa/screens/profileEditScreen.dart';
+import 'package:intl/intl.dart';
 
 Future<void> showDialogForDate(context, name , index) async {
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
@@ -75,7 +78,16 @@ Future<void> showDialogForDate(context, name , index) async {
               style: GoogleFonts.poppins(),
             ),
             onPressed: () {
-              p.createReservation(_timeController.text, name , index);
+              print(_timeController.text);
+              DateTime now = new DateTime.now();
+              String dateFormatted = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(now);
+              String date = _timeController.text == "" ? dateFormatted : _timeController.text;
+              Map<String , String> dateTimeFormat = convertDateToProperFormat(now);
+              String nowTime  = dateTimeFormat['Time'];
+              if(_timeController.text != "")
+                date = dateFormatted.replaceAll(nowTime, _timeController.text+":00");
+              print(date);
+              p.createReservation(date, name , index);
               Navigator.of(context).pop();
             },
           ),

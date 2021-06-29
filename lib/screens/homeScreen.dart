@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.poppins(),
           ),
           actions: [
-            if (selectedPage != 1)
+            if (_selected != 1)
               IconButton(
                   onPressed: () {
                     Navigator.pushNamed(context, SearchPage.id);

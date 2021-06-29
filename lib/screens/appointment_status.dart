@@ -1,9 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_device_type/flutter_device_type.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/member_state_changed.dart';
 import 'package:skywa/api_calls/add_update_reservation.dart';
@@ -11,10 +8,7 @@ import 'package:skywa/api_calls/delete_reservation.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_calls/q_meta_data.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
-import 'package:skywa/screens/homeScreen.dart';
-import 'package:skywa/utils/open_google_map.dart';
 import 'package:timelines/timelines.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 const kTileHeight = 50.0;
 
@@ -75,6 +69,12 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
     }
   }
 
+  refresh(){
+    setState(() {
+
+    });
+  }
+
   Future<void> checkStateAfterArrival() async {
     await getSingleReservation.getCurrentReservation();
     if (currentReservation.currentRes.MemberState == "Called To Enter") {
@@ -117,10 +117,10 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
   @override
   void initState() {
     super.initState();
-    // if (currentReservation.currentRes.MemberState == "Arrived")
-    //   setUpTimedFetch();
-    // if (currentReservation.currentRes.MemberState == "Not Arrived")
-    //   setUpTimedDistanceFetch();
+    if (currentReservation.currentRes.MemberState == "Arrived")
+      setUpTimedFetch();
+    if (currentReservation.currentRes.MemberState == "Not Arrived")
+      setUpTimedDistanceFetch();
   }
 
   @override
@@ -251,139 +251,105 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(8.0),
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10.0),
-                    ),
-                    color: Color(0xFFFFA63C),
-                  ),
-                  child: Text(
-                    statusMess[context.read<MemberStateChanged>().statusIndex],
-                    style: TextStyle(
-                        fontSize: 15.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                //if (context.read<MemberStateChanged>().statusIndex == 0)
-                Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.place,
-                          color: Theme.of(context).primaryColor,
-                          size: 30.0,
-                        ),
-                        SizedBox(
-                          width: 10.0,
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width*0.6,
-                          child: Text(
-                            'Reached the business but appointment status is not updated. Manually update the status.',
-                            textAlign: TextAlign.justify,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20.0,
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            print(currentReservation.currentRes.DevideID);
-                            Map<String, dynamic> reservationValues = resObject();
-                            await addUpdateReservation
-                                .addUpdateRes(reservationValues);
-                            await getSingleReservation.getCurrentReservation();
-                            if (currentReservation.currentRes.MemberState ==
-                                "Arrived")
-                              Provider.of<MemberStateChanged>(context, listen: false)
-                                  .changeStatusIndex(1);
-                            setState(() {});
-                          },
-                          child: Text(
-                            'Arrived',
-                          ),
-                        ),
-                      ],
-                    ),
-                    // TextButton(
-                    //   onPressed: () {},
-                    //   style: ButtonStyle(
-                    //     backgroundColor: MaterialStateProperty.all(
-                    //         Colors.grey[400]),
-                    //     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    //       RoundedRectangleBorder(
-                    //         borderRadius: BorderRadius.circular(4.0),
-                    //       ),
-                    //     ),
-                    //   ),
-                    //   child: Text(
-                    //     'Running Late',
-                    //     style: TextStyle(
-                    //       fontWeight: FontWeight.bold,
-                    //       color: Colors.white,
-                    //     ),
-                    //   ),
-                    // ),
-                    // TextButton(
-                    //   onPressed: () {},
-                    //   style: ButtonStyle(
-                    //     backgroundColor: MaterialStateProperty.all(
-                    //         Colors.grey[400]),
-                    //     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    //       RoundedRectangleBorder(
-                    //         borderRadius: BorderRadius.circular(4.0),
-                    //       ),
-                    //     ),
-                    //   ),
-                    //   child: Text(
-                    //     'Available Early',
-                    //     style: TextStyle(
-                    //       fontWeight: FontWeight.bold,
-                    //       color: Colors.white
-                    //     ),
-                    //   ),
-                    // )
-                  ],
-                )
-              ],
-            ),
-          )
+          StatusMessage(
+            updateParent: refresh,
+          ),
         ],
       ),
     );
   }
 }
 
-final _processes = [
-  'Checked In',
-  'Arrived',
-  'Called In',
-  'In Facility',
-];
 
-final statusMess = [
-  'You have not arrived at the Business, once you arrive the business will be notified that you are ready for your appointment.',
-  'You have arrived for the appointment. please wait near by until called.',
-  'We are ready for you please walk to the entrance.',
-  'Your appointment is in progress.',
-];
+class StatusMessage extends StatefulWidget {
+  final Function() updateParent;
+  const StatusMessage({Key key , @required this.updateParent}) : super(key: key);
+
+  @override
+  _StatusMessageState createState() => _StatusMessageState();
+}
+
+class _StatusMessageState extends State<StatusMessage> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8.0),
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(10.0),
+              ),
+              color: Color(0xFFFFA63C),
+            ),
+            child: Text(
+              statusMess[context.read<MemberStateChanged>().statusIndex],
+              style: TextStyle(
+                  fontSize: 15.0,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(
+            height: 20.0,
+          ),
+          if (context.read<MemberStateChanged>().statusIndex == 0)
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.place,
+                      color: Theme.of(context).primaryColor,
+                      size: 30.0,
+                    ),
+                    SizedBox(
+                      width: 10.0,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width*0.6,
+                      child: Text(
+                        'Reached the business but appointment status is not updated. Manually update the status.',
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        print(currentReservation.currentRes.DevideID);
+                        Map<String, dynamic> reservationValues = resObject();
+                        await addUpdateReservation.addUpdateRes(reservationValues);
+                        await getSingleReservation.getCurrentReservation();
+                        if (currentReservation.currentRes.MemberState == "Arrived"){
+                          Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(1);
+                        }
+                        widget.updateParent();
+                      },
+                      child: Text(
+                        'Arrived',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+        ],
+      ),
+    );
+  }
+}
+
 
 class ButtonRow extends StatefulWidget {
-  const ButtonRow({Key key}) : super(key: key);
+  final Function() notifyParent;
+  const ButtonRow({Key key , @required this.notifyParent}) : super(key: key);
 
   @override
   _ButtonRowState createState() => _ButtonRowState();
@@ -397,10 +363,9 @@ class _ButtonRowState extends State<ButtonRow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (context.read<MemberStateChanged>().statusIndex != 1)
             IconButton(
               onPressed: () {
-                MapUtils.openMap(31.968599, -99.901810);
+                //MapUtils.openMap(31.968599, -99.901810);
               },
               icon: Icon(Icons.directions),
               iconSize: 30.0,
@@ -461,7 +426,8 @@ class _ButtonRowState extends State<ButtonRow> {
                         ElevatedButton(
                           onPressed: () async {
                             await deleteReservation.deleteRes();
-                            setState(() {});
+                            widget.notifyParent();
+                            Navigator.pop(context);
                           },
                           child: Text(
                             'Delete',
@@ -476,11 +442,12 @@ class _ButtonRowState extends State<ButtonRow> {
                         )
                       ],
                     );
-                  });
+                  }
+              );
             },
             child: Text(
-                  'Cancel',
-                ),
+              'Cancel',
+            ),
             style: ButtonStyle(
                 backgroundColor:
                 MaterialStateProperty.all(Colors.redAccent)),
@@ -490,6 +457,21 @@ class _ButtonRowState extends State<ButtonRow> {
     );
   }
 }
+
+
+final _processes = [
+  'Checked In',
+  'Arrived',
+  'Called In',
+  'In Facility',
+];
+
+final statusMess = [
+  'You have not arrived at the Business, once you arrive the business will be notified that you are ready for your appointment.',
+  'You have arrived for the appointment. please wait near by until called.',
+  'We are ready for you please walk to the entrance.',
+  'Your appointment is in progress.',
+];
 
 
 //Color(0xff5ec792);

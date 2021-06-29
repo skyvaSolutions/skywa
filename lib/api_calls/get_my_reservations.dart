@@ -12,7 +12,8 @@ GetMyReservations getMyReservations = new GetMyReservations();
 class GetMyReservations{
 
 
-  void findReservations() async {
+  Future<void> findReservations() async {
+    myReservations.reservationsList = [];
     print("GetMyReservations api called");
     String deviceId = userSettings.deviceID.value;
     String url = "https://shoeboxtx.veloxe.com:36251/api/GetMyReservations?UserToken=$deviceId";

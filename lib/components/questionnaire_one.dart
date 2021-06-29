@@ -24,7 +24,7 @@ class QuestionnaireOne extends StatefulWidget {
 List<Container> returnIndicators(BuildContext context, int index) {
   print(index);
   List<Container> indicators = [];
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 2; i++) {
     indicators.add(
       new Container(
         margin: EdgeInsets.only(right: 6),
@@ -42,168 +42,164 @@ List<Container> returnIndicators(BuildContext context, int index) {
 class _QuestionnaireOneState extends State<QuestionnaireOne> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      child: FormBuilder(
-        key: _formKey,
-        child: ListView(
-          children: [
-            Container(
-              margin: EdgeInsets.only(bottom: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: returnIndicators(context, widget.pageNum),
-              ),
-            ),
-            Text(
-              'Tell us more about your self.',
-              style: TextStyle(
-                fontSize: 18.0,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-            FormBuilderTextField(
-              style: GoogleFonts.lato(fontSize: 19),
-              name: 'Name',
-              controller: nameHolder,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(context,
-                    errorText: 'This field cannot be empty'),
-                FormBuilderValidators.max(context, 70),
-                (val) {}
-              ]),
-            ),
-            SizedBox(
-              height: 18,
-            ),
-            FormBuilderTextField(
-              style: GoogleFonts.lato(fontSize: 19),
-              name: 'Email',
-              controller: emailHolder,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.email(context),
-              ]),
-            ),
-            SizedBox(
-              height: 18,
-            ),
-            FormBuilderDateTimePicker(
-              initialTime: TimeOfDay(hour: 8, minute: 0),
-              inputType: InputType.date,
-              initialValue: getPerson.fetchedVal['dob'] == null
-                  ? getPerson.fetchedVal['dob']
-                  : convertDateFromString(getPerson.fetchedVal['dob']),
-              decoration: InputDecoration(
-                labelText: 'Date of Birth',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              name: "DateOfBirth",
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FormBuilderChoiceChip(
-              decoration: InputDecoration(
-                labelText: 'Gender',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              name: 'Gender',
-              spacing: 20.0,
-              alignment: WrapAlignment.center,
-              initialValue: getPerson.fetchedVal['gender'],
-              onChanged: (String value) {},
-              options: ['Male', 'Female', 'Others']
-                  .map((lang) => FormBuilderFieldOption(
-                        value: lang,
-                        child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Text(
-                              lang,
-                              style: GoogleFonts.lato(),
-                            )),
-                      ))
-                  .toList(growable: false),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            FormBuilderTextField(
-              style: GoogleFonts.lato(fontSize: 19),
-              name: 'Address',
-              controller: addressHolder,
-              decoration: InputDecoration(
-                labelText: 'Address',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: FormBuilderValidators.compose(
-                  [FormBuilderValidators.max(context, 70), (val) {}]),
-            ),
-            SizedBox(
-              height: 12,
-            ),
-            FormBuilderTextField(
-              style: GoogleFonts.lato(fontSize: 19),
-              name: 'Phone Number',
-              controller: phoneNumberHolder,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              validator: FormBuilderValidators.compose(
-                [
-                  FormBuilderValidators.minLength(context, 10,
-                      errorText: 'Enter a valid Phone Number'),
-                  FormBuilderValidators.maxLength(context, 10,
-                      errorText: 'Enter a valid Phone Number'),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 15.0,
-            ),
-            Row(
+    return Scaffold(
+      bottomNavigationBar: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          TextButton(
+              onPressed: (){
+                _formKey.currentState.reset();
+                nameHolder.clear();
+                emailHolder.clear();
+                addressHolder.clear();
+                phoneNumberHolder.clear();
+              },
+              child: Text('Reset')
+          ),
+          Container(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _formKey.currentState.reset();
-                    nameHolder.clear();
-                    emailHolder.clear();
-                    addressHolder.clear();
-                    phoneNumberHolder.clear();
-                  },
-                  child: Text('Reset'),
-                ),
-                SizedBox(
-                  width: 20.0,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    onSavePressed(_formKey, context);
-                    Navigator.pushNamed(context, 'Question2');
-                  },
-                  child: Text('Next'),
-                ),
-              ],
+              children: returnIndicators(context, widget.pageNum),
             ),
-          ],
+          ),
+          TextButton(
+            onPressed: () {
+              onSavePressed(_formKey, context);
+              Navigator.pushNamed(context, 'Question3');
+            },
+            child: Text('Next'),
+          ),
+
+        ],
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(20.0),
+        child: FormBuilder(
+          key: _formKey,
+          child: ListView(
+            children: [
+              Text(
+                'Tell us more about your self.',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+              FormBuilderTextField(
+                style: GoogleFonts.lato(fontSize: 19),
+                name: 'Name',
+                controller: nameHolder,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(context,
+                      errorText: 'This field cannot be empty'),
+                  FormBuilderValidators.max(context, 70),
+                  (val) {}
+                ]),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              FormBuilderTextField(
+                style: GoogleFonts.lato(fontSize: 19),
+                name: 'Email',
+                controller: emailHolder,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.email(context),
+                ]),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              FormBuilderDateTimePicker(
+                initialTime: TimeOfDay(hour: 8, minute: 0),
+                inputType: InputType.date,
+                initialValue: getPerson.fetchedVal['dob'] == null
+                    ? getPerson.fetchedVal['dob']
+                    : convertDateFromString(getPerson.fetchedVal['dob']),
+                decoration: InputDecoration(
+                  labelText: 'Date of Birth',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                name: "DateOfBirth",
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              FormBuilderChoiceChip(
+                decoration: InputDecoration(
+                  labelText: 'Gender',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                name: 'Gender',
+                spacing: 20.0,
+                alignment: WrapAlignment.center,
+                initialValue: getPerson.fetchedVal['gender'],
+                onChanged: (String value) {},
+                options: ['Male', 'Female', 'Others']
+                    .map((lang) => FormBuilderFieldOption(
+                          value: lang,
+                          child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Text(
+                                lang,
+                                style: GoogleFonts.lato(),
+                              )),
+                        ))
+                    .toList(growable: false),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              FormBuilderTextField(
+                style: GoogleFonts.lato(fontSize: 19),
+                name: 'Address',
+                controller: addressHolder,
+                decoration: InputDecoration(
+                  labelText: 'Address',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: FormBuilderValidators.compose(
+                    [FormBuilderValidators.max(context, 70), (val) {}]),
+              ),
+              SizedBox(
+                height: 12,
+              ),
+              FormBuilderTextField(
+                style: GoogleFonts.lato(fontSize: 19),
+                name: 'Phone Number',
+                controller: phoneNumberHolder,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  border:
+                      OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: FormBuilderValidators.compose(
+                  [
+                    FormBuilderValidators.minLength(context, 10,
+                        errorText: 'Enter a valid Phone Number'),
+                    FormBuilderValidators.maxLength(context, 10,
+                        errorText: 'Enter a valid Phone Number'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

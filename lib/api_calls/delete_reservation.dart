@@ -11,7 +11,7 @@ class DeleteReservation {
     print("DeleteReservation api called");
     String deviceId = userSettings.deviceID.value;
     String reservationId = currentReservation.CurrentReservationId;
-    String url = "https://shoeboxtx.veloxe.com:36251/api/DeleteReservation?UserToken=$deviceId?ReservationID=$reservationId";
+    String url = "https://shoeboxtx.veloxe.com:36251/api/DeleteReservation?UserToken=$deviceId&ReservationID=$reservationId";
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       print('DeleteReservation : Success');

@@ -36,7 +36,7 @@ class createReservationProvider with ChangeNotifier {
       // "LastReportedLocationAccuracy": "notSet",
       // "NoShowCount": "notSet",
       "MemberStateUpdateTimeStamp": startTime,
-      "WaitTime": 10,
+      //"WaitTime": 10,
       "ReservationType": "Vax",
       "PhoneNumber": "+1 242-302-4710",
       "NumberOfPeopleOnReservation": "1",

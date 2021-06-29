@@ -53,10 +53,10 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
         body: Navigator(
           onGenerateRoute: (settings) {
             Widget page = QuestionnaireOne(pageNum: 0);
-            if (settings.name == 'Question2')
-              page = QuestionnaireTwo(pageNum: 1);
+            // if (settings.name == 'Question2')
+            //   page = QuestionnaireTwo(pageNum: 1);
             if(settings.name == 'Question3')
-              page = QuestionnaireThree(pageNum: 2);
+              page = QuestionnaireThree(pageNum: 1);
             return MaterialPageRoute(builder: (_) => page);
           },
         ),

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
@@ -16,12 +18,13 @@ class createReservationProvider with ChangeNotifier {
     double lat = l.p.latitude;
     String resId = uuid.v1();
     double long = l.p.longitude;
+    print(date);
     Dio dio = new Dio();
     var data = {
       "DeviceID": deviceId,
       "MemberState": "Not Arrived",
       "ReservationID": resId,
-      "ReservationStartTime": date,
+      "ReservationStartTime": startTime,
       "Latitude": lat.toString(),
       "Longitude": long.toString(),
       "QID": nearbyQs[index].qid,

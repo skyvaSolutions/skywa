@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/ThemeProvider.dart';
+import 'package:skywa/Providers/appointmentScreenProvider.dart';
 import 'package:skywa/Providers/createReservationProvider.dart';
 import 'package:skywa/Providers/searchProvider.dart';
 import 'package:skywa/screens/helpScreen.dart';
@@ -26,6 +27,7 @@ void main() async {
   // print("firebase initialized, ${DateTime.now()}");
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ThemeProvider()),
+    ChangeNotifierProvider(create: (context) => appointmentScreenProvider()),
     ChangeNotifierProvider(create: (context) => searchProvider()),
     ChangeNotifierProvider(create: (context) => createReservationProvider()),
   ], child: MyApp()));

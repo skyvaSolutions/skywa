@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skywa/Providers/appointmentScreenProvider.dart';
 import 'package:skywa/components/upcomingScreen.dart';
 
 class Appointment extends StatefulWidget {
@@ -10,7 +12,18 @@ class Appointment extends StatefulWidget {
 
 class _AppointmentState extends State<Appointment> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final p = Provider.of<appointmentScreenProvider>(context, listen: false);
+      p.getReservations();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final pa = Provider.of<appointmentScreenProvider>(context);
     return DefaultTabController(
       initialIndex: 1,
       length: 3,
@@ -34,14 +47,16 @@ class _AppointmentState extends State<Appointment> {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: <Widget>[
-            Upcoming(),
-            Center(
-              child: Text("Past"),
+            Upcoming(
+              list: pa.upcomingRes,
             ),
-            Center(
-              child: Text("Active"),
+            Upcoming(
+              list: pa.pastRes,
+            ),
+            Upcoming(
+              list: pa.activeRes,
             ),
           ],
         ),

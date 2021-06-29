@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
     getDeviceInfo(context);
     return Scaffold(
       body: Center(
-        child: Text('Put Some Cool Splash Screen Here'),
+        child: Image.asset('assets/images/icon white background.png'),
       ),
     );
   }
@@ -92,9 +92,10 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacementNamed(context, HomeScreen.id);
     }
 /////////////////////////calling GetMyPeople API to check whether there is a registered customer or not with this device//////////////////////////////////////////////////////
-     findUsers.returnPerson(context);
+    findUsers.returnPerson(context);
   }
 }
+
 Future<void> getProfileData() async {
   print("Getting profile Data");
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -105,9 +106,6 @@ Future<void> getProfileData() async {
       readBoolFromLocal(prefs, userSettings.userSetting1.key, false);
   userSettings.numUsages.value = updateNumberOfUsages(prefs);
 }
-
-
-
 
 class PushNotification {
   PushNotification({

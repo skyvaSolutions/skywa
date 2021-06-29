@@ -18,13 +18,14 @@ class createReservationProvider with ChangeNotifier {
     double lat = l.p.latitude;
     String resId = uuid.v1();
     double long = l.p.longitude;
+    print("here2");
     print(date);
     Dio dio = new Dio();
     var data = {
       "DeviceID": deviceId,
       "MemberState": "Not Arrived",
       "ReservationID": resId,
-      "ReservationStartTime": startTime,
+      "ReservationStartTime": date,
       "Latitude": lat.toString(),
       "Longitude": long.toString(),
       "QID": nearbyQs[index].qid,

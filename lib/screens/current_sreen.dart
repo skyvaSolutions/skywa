@@ -1,19 +1,15 @@
 import 'dart:async';
-
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/member_state_changed.dart';
-import 'package:skywa/api_calls/delete_reservation.dart';
 import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/api_responses/reservations.dart';
 import 'package:skywa/model/reservation.dart';
 import 'package:skywa/screens/appointment_status.dart';
-import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
 import 'package:skywa/screens/questionairre_screen.dart';
 
@@ -325,72 +321,72 @@ class Footer extends StatefulWidget {
 class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(Icons.info , color: Theme.of(context).primaryColor,),
-            title: Text('More Information' , style: TextStyle(fontWeight: FontWeight.bold),),
-            trailing: Icon(Icons.arrow_forward_ios),
-            tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-            horizontalTitleGap: 10.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            onTap: (){},
+    return Column(
+      children: [
+        SizedBox(
+          height: 20.0,
+        ),
+        ListTile(
+          leading: Icon(Icons.info , color: Theme.of(context).primaryColor,),
+          title: Text('More Information' , style: TextStyle(fontWeight: FontWeight.bold),),
+          trailing: Icon(Icons.arrow_forward_ios),
+          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          horizontalTitleGap: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          SizedBox(
-            height: 10.0,
+          onTap: (){},
+        ),
+        SizedBox(
+          height: 10.0,
+        ),
+        ListTile(
+          leading: Icon(Icons.person , color: Theme.of(context).primaryColor,),
+          title: Text('Forms' , style: TextStyle(fontWeight: FontWeight.bold),),
+          trailing: Icon(Icons.arrow_forward_ios),
+          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          horizontalTitleGap: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          ListTile(
-            leading: Icon(Icons.person , color: Theme.of(context).primaryColor,),
-            title: Text('Forms' , style: TextStyle(fontWeight: FontWeight.bold),),
-            trailing: Icon(Icons.arrow_forward_ios),
-            tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-            horizontalTitleGap: 10.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            onTap: (){setState(() {
-              customQuestionnaireVisited = true;
-            });
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => QuestionnairePage(
-                  pageNum: 0,
-                )));
-            },
+          onTap: (){setState(() {
+            customQuestionnaireVisited = true;
+          });
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => QuestionnairePage(
+                pageNum: 0,
+              )));
+          },
+        ),
+        SizedBox(
+          height: 10.0,
+        ),
+        ListTile(
+          leading: Icon(Icons.chat ,  color: Theme.of(context).primaryColor,),
+          title: Text('Chat with business' , style: TextStyle(fontWeight: FontWeight.bold),),
+          trailing: Icon(Icons.arrow_forward_ios),
+          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          horizontalTitleGap: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          SizedBox(
-            height: 10.0,
+          onTap: (){},
+        ),
+        SizedBox(
+          height: 10.0,
+        ),
+        ListTile(
+          leading: Icon(Icons.phone_in_talk ,  color: Theme.of(context).primaryColor,),
+          title: Text('Call Business' , style: TextStyle(fontWeight: FontWeight.bold),),
+          trailing: Icon(Icons.arrow_forward_ios),
+          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+          horizontalTitleGap: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          ListTile(
-            leading: Icon(Icons.chat ,  color: Theme.of(context).primaryColor,),
-            title: Text('Chat with business' , style: TextStyle(fontWeight: FontWeight.bold),),
-            trailing: Icon(Icons.arrow_forward_ios),
-            tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-            horizontalTitleGap: 10.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            onTap: (){},
-          ),
-          SizedBox(
-            height: 10.0,
-          ),
-          ListTile(
-            leading: Icon(Icons.phone_in_talk ,  color: Theme.of(context).primaryColor,),
-            title: Text('Call Business' , style: TextStyle(fontWeight: FontWeight.bold),),
-            trailing: Icon(Icons.arrow_forward_ios),
-            tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-            horizontalTitleGap: 10.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            onTap: (){},
-          ),
-        ],
-      ),
+          onTap: (){},
+        ),
+      ],
     );
   }
 }

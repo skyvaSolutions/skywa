@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 
 AddUpdateReservation addUpdateReservation = new AddUpdateReservation();
 

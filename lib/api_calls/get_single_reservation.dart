@@ -26,7 +26,6 @@ class GetSingleReservation{
       Map<String, dynamic> res = json.decode(response.body);
       print(res);
       currentReservation.currentRes = Reservation.fromJson(res);
-      //print(currentReservation.currentRes.CompanyName);
     }
     else {
       print('GetSingleReservation : Error');

@@ -8,6 +8,7 @@ import 'package:skywa/api_calls/delete_reservation.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_calls/q_meta_data.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
+import 'package:skywa/services/locationServices.dart';
 import 'package:timelines/timelines.dart';
 
 const kTileHeight = 50.0;
@@ -18,8 +19,12 @@ const inProgressColor = Color(0xFFFFA63C);
 
 const todoColor = Color(0xffd1d2d7);
 
+double latitude;
+
+double longitude;
+
 bool stopDistanceTimer = false;
-bool stopArrivedTimer = true;//todo
+bool stopArrivedTimer = false;
 
 void callUpdateReservationApi(Map<String, dynamic> reservationValues) async {
   await addUpdateReservation.addUpdateRes(reservationValues);
@@ -33,7 +38,14 @@ List<IconData> timelineIcons = [
   Icons.airline_seat_recline_normal
 ];
 
-Map<String, dynamic> resObject() {
+Future<void> getLocation () async {
+    Location l = new Location();
+    await l.getCurrentLocation();
+    latitude = l.p.latitude;
+    longitude = l.p.longitude;
+}
+
+ Map<String, dynamic> resObject() {
   Map<String, dynamic> reservationValues = {};
   reservationValues["DeviceID"] = currentReservation.currentRes.DevideID;
   reservationValues["QID"] = currentReservation.currentRes.QID;
@@ -44,8 +56,8 @@ Map<String, dynamic> resObject() {
       currentReservation.currentRes.ReservationStartTime;
   reservationValues["ReservationType"] =
       currentReservation.currentRes.ReservationType;
-  reservationValues["Latitude"] = currentReservation.currentRes.Latitude;
-  reservationValues["Longitude"] = currentReservation.currentRes.Longitude;
+  reservationValues["Latitude"] = latitude.toString();
+  reservationValues["Longitude"] = longitude.toString();
   reservationValues["NumberOfPeopleOnReservation"] =
       currentReservation.currentRes.NumberOfPeopleOnReservation;
   reservationValues["AttendeeData"] =
@@ -71,27 +83,31 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 
   refresh(){
     setState(() {
-
     });
   }
 
   Future<void> checkStateAfterArrival() async {
-    await getSingleReservation.getCurrentReservation();
-    if (currentReservation.currentRes.MemberState == "Called To Enter") {
-      stopArrivedTimer = true;
-      setState(() {});
+    if(currentReservation.currentRes.MemberState == "Arrived"){
+      await getSingleReservation.getCurrentReservation();
+      if (currentReservation.currentRes.MemberState == "Called To Enter") {
+        stopArrivedTimer = true;
+        setState(() {});
+      }
     }
   }
 
   Future<void> checkForDistance() async {
-    double calculatedDistance = await qMetaData.calculateDistance();
-    if (calculatedDistance != -1) {
-      if (calculatedDistance <= qMetaData.parkingLotDistance) {
-        Map<String, dynamic> reservationValues = resObject();
-        await addUpdateReservation.addUpdateRes(reservationValues);
-        await getSingleReservation.getCurrentReservation();
-        stopDistanceTimer = true;
-        setState(() {});
+    if(currentReservation.currentRes.MemberState == "Not Arrived"){
+      double calculatedDistance = await qMetaData.calculateDistance();
+      if (calculatedDistance != -1) {
+        if (calculatedDistance <= qMetaData.parkingLotDistance) {
+          Map<String, dynamic> reservationValues = resObject();
+          await addUpdateReservation.addUpdateRes(reservationValues);
+          await getSingleReservation.getCurrentReservation();
+          stopDistanceTimer = true;
+          setUpTimedFetch();
+          setState(() {});
+        }
       }
     }
   }
@@ -117,10 +133,8 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
   @override
   void initState() {
     super.initState();
-    if (currentReservation.currentRes.MemberState == "Arrived")
-      setUpTimedFetch();
-    if (currentReservation.currentRes.MemberState == "Not Arrived")
-      setUpTimedDistanceFetch();
+    setUpTimedDistanceFetch();
+    setUpTimedFetch();
   }
 
   @override
@@ -147,6 +161,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           ),
           Container(
             height: MediaQuery.of(context).size.height * 0.15,
+            margin: EdgeInsets.symmetric(vertical: 10.0),
             child: Timeline.tileBuilder(
               theme: TimelineThemeData(
                 direction: Axis.horizontal,
@@ -253,6 +268,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           ),
           StatusMessage(
             updateParent: refresh,
+            setUpTimedFetch: setUpTimedFetch,
           ),
         ],
       ),
@@ -263,7 +279,8 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 
 class StatusMessage extends StatefulWidget {
   final Function() updateParent;
-  const StatusMessage({Key key , @required this.updateParent}) : super(key: key);
+  final Function() setUpTimedFetch ;
+  const StatusMessage({Key key , @required this.updateParent , @required this.setUpTimedFetch}) : super(key: key);
 
   @override
   _StatusMessageState createState() => _StatusMessageState();
@@ -294,34 +311,25 @@ class _StatusMessageState extends State<StatusMessage> {
             ),
           ),
           SizedBox(
-            height: 20.0,
+            height: 30.0,
           ),
           if (context.read<MemberStateChanged>().statusIndex == 0)
             Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.place,
-                      color: Theme.of(context).primaryColor,
-                      size: 30.0,
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    Container(
+                ListTile(
+                    title : Container(
                       width: MediaQuery.of(context).size.width*0.6,
                       child: Text(
-                        'Reached the business but appointment status is not updated. Manually update the status.',
+                        'Update status.',
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                         textAlign: TextAlign.justify,
                       ),
                     ),
-                    SizedBox(
-                      width: 20.0,
-                    ),
-                    ElevatedButton(
+                   subtitle: Text('Arrived at the business? Click on Arrived to manually update it.'),
+                   trailing : ElevatedButton(
                       onPressed: () async {
                         print(currentReservation.currentRes.DevideID);
                         Map<String, dynamic> reservationValues = resObject();
@@ -330,13 +338,13 @@ class _StatusMessageState extends State<StatusMessage> {
                         if (currentReservation.currentRes.MemberState == "Arrived"){
                           Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(1);
                         }
+                        widget.setUpTimedFetch();
                         widget.updateParent();
                       },
                       child: Text(
                         'Arrived',
                       ),
                     ),
-                  ],
                 ),
               ],
             )
@@ -426,6 +434,8 @@ class _ButtonRowState extends State<ButtonRow> {
                         ElevatedButton(
                           onPressed: () async {
                             await deleteReservation.deleteRes();
+                            stopArrivedTimer = true;
+                            stopDistanceTimer = true;
                             widget.notifyParent();
                             Navigator.pop(context);
                           },

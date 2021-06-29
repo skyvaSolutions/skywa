@@ -8,6 +8,7 @@ import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/api_responses/reservations.dart';
+import 'package:skywa/components/footer_tile.dart';
 import 'package:skywa/model/reservation.dart';
 import 'package:skywa/screens/appointment_status.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
@@ -19,31 +20,30 @@ bool customQuestionnaireVisited = false;
 
 Future<void> _future;
 
-
-
 Future<void> getAndSortReservations() async {
   await getMyReservations.findReservations();
   List<Reservation> todayRes = [];
   if (myReservations.noReservations == false) {
     for (int i = 0; i < myReservations.reservationsList.length; i++) {
-      DateTime today = DateTime.now();
-      int todayDay = today.day;
-      int todayMonth = today.month;
-      int todayYear = today.year;
-      DateTime reservationTime = convertDateFromString(
-          myReservations.reservationsList[i].ReservationStartTime);
-      print("$i th time" + reservationTime.toString());
-      int resDay = reservationTime.day;
-      int resMonth = reservationTime.month;
-      int resYear = reservationTime.year;
-      todayRes.add(myReservations.reservationsList[i]);
-      if (resDay == todayDay &&
-          resMonth == todayMonth &&
-          resYear == todayYear) {
-        print(resDay);
-        print(resYear);
-        print(resMonth);
+      if(myReservations.reservationsList[i].MemberState != 'Completed') {
+
+        DateTime today = DateTime.now();
+        int todayDay = today.day;
+        int todayMonth = today.month;
+        int todayYear = today.year;
+        DateTime reservationTime = convertDateFromString(
+            myReservations.reservationsList[i].ReservationStartTime);
+        int resDay = reservationTime.day;
+        int resMonth = reservationTime.month;
+        int resYear = reservationTime.year;
         todayRes.add(myReservations.reservationsList[i]);
+        if (resDay == todayDay &&
+            resMonth == todayMonth &&
+            resYear == todayYear) {
+          print(myReservations.reservationsList[i].MemberState);
+          todayRes.add(myReservations.reservationsList[i]);
+        }
+
       }
     }
     print(todayRes.length);
@@ -53,6 +53,7 @@ Future<void> getAndSortReservations() async {
           convertDateFromString(res1.ReservationStartTime)
               .compareTo(convertDateFromString(res2.ReservationStartTime)));
       print(todayRes[0].ReservationStartTime);
+      print(todayRes[0].MemberState);
       currentReservation.CurrentReservationId = todayRes[0].ReservationID;
       currentReservation.QId = todayRes[0].QID;
       await getSingleReservation.getCurrentReservation();
@@ -65,22 +66,18 @@ class CurrentScreen extends StatefulWidget {
   _CurrentScreenState createState() => _CurrentScreenState();
 }
 
-
-
 class _CurrentScreenState extends State<CurrentScreen> {
-
   setUpApiCall() {
-   setState(() {
-     _future = getAndSortReservations();
-   });
+    setState(() {
+      _future = getAndSortReservations();
+    });
   }
+
   @override
   void initState() {
     super.initState();
     setUpApiCall();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -107,8 +104,12 @@ class _CurrentScreenState extends State<CurrentScreen> {
                       color: Theme.of(context).primaryColor,
                     ),
                   ),
-                  SizedBox(height: 10.0,),
-                  CircularProgressIndicator(color: Theme.of(context).primaryColor,),
+                  SizedBox(
+                    height: 10.0,
+                  ),
+                  CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ],
               ),
             );
@@ -148,14 +149,14 @@ class _CurrentScreenState extends State<CurrentScreen> {
                     ChangeNotifierProvider<MemberStateChanged>(
                         create: (context) => MemberStateChanged()),
                   ],
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: ListView(
                     children: [
                       SizedBox(
                         height: 10.0,
                       ),
-                      Header(notifyParent: setUpApiCall,),
+                      Header(
+                        notifyParent: setUpApiCall,
+                      ),
                       SizedBox(
                         height: 10.0,
                       ),
@@ -168,16 +169,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
                         height: 10.0,
                       ),
                       AppointmentStatus(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Expanded(
-                        child: ListView(
-                          children: [
-                            Footer(),
-                          ],
-                        ),
-                      ),
+                      Footer(),
                     ],
                   ),
                 );
@@ -191,7 +183,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
 
 class Header extends StatefulWidget {
   final Function() notifyParent;
-  const Header({Key key , @required this.notifyParent}) : super(key: key);
+  const Header({Key key, @required this.notifyParent}) : super(key: key);
   @override
   _HeaderState createState() => _HeaderState();
 }
@@ -233,6 +225,7 @@ class _HeaderState extends State<Header> {
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor),
                 ),
+                SizedBox(width: 5.0,),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -252,28 +245,25 @@ class AppointmentDateTime extends StatefulWidget {
   _AppointmentDateTimeState createState() => _AppointmentDateTimeState();
 }
 
-Map<String , String> convertDateToProperFormat(DateTime dateCon){
+Map<String, String> convertDateToProperFormat(DateTime dateCon) {
   int resDay = dateCon.day;
   int resMonth = dateCon.month;
   int resHour = dateCon.hour;
   int resMin = dateCon.minute;
   int resSec = dateCon.second;
 
-  String resDayStr =
-  resDay < 10 ? "0" + resDay.toString() : resDay.toString();
+  String resDayStr = resDay < 10 ? "0" + resDay.toString() : resDay.toString();
   String resMonthStr =
-  resMonth < 10 ? "0" + resMonth.toString() : resMonth.toString();
+      resMonth < 10 ? "0" + resMonth.toString() : resMonth.toString();
 
   String resHourStr =
-  resHour < 10 ? "0" + resHour.toString() : resHour.toString();
-  String resMinStr =
-  resMin < 10 ? "0" + resMin.toString() : resMin.toString();
-  String resSecStr =
-  resSec < 10 ? "0" + resSec.toString() : resSec.toString();
+      resHour < 10 ? "0" + resHour.toString() : resHour.toString();
+  String resMinStr = resMin < 10 ? "0" + resMin.toString() : resMin.toString();
+  String resSecStr = resSec < 10 ? "0" + resSec.toString() : resSec.toString();
 
   String date = resDayStr + "-" + resMonthStr + "-" + dateCon.year.toString();
   String time = resHourStr + ":" + resMinStr + ":" + resSecStr;
-  Map<String , String> convertedDateTime = {};
+  Map<String, String> convertedDateTime = {};
   convertedDateTime['Date'] = date;
   convertedDateTime['Time'] = time;
   return convertedDateTime;
@@ -285,9 +275,9 @@ class _AppointmentDateTimeState extends State<AppointmentDateTime> {
     DateTime dateCon = convertDateFromString(
         currentReservation.currentRes.ReservationStartTime);
 
-   Map<String , String> resDateTime = convertDateToProperFormat(dateCon);
-   String date = resDateTime['Date'];
-   String time = resDateTime['Time'];
+    Map<String, String> resDateTime = convertDateToProperFormat(dateCon);
+    String date = resDateTime['Date'];
+    String time = resDateTime['Time'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -321,73 +311,39 @@ class Footer extends StatefulWidget {
 class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 20.0,
-        ),
-        ListTile(
-          leading: Icon(Icons.info , color: Theme.of(context).primaryColor,),
-          title: Text('More Information' , style: TextStyle(fontWeight: FontWeight.bold),),
-          trailing: Icon(Icons.arrow_forward_ios),
-          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-          horizontalTitleGap: 10.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 20.0,
           ),
-          onTap: (){},
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        ListTile(
-          leading: Icon(Icons.person , color: Theme.of(context).primaryColor,),
-          title: Text('Forms' , style: TextStyle(fontWeight: FontWeight.bold),),
-          trailing: Icon(Icons.arrow_forward_ios),
-          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-          horizontalTitleGap: 10.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+          FooterTile(
+            icon: Icons.info,
+            text: 'More Information',
+            onPressed: () {},
           ),
-          onTap: (){setState(() {
-            customQuestionnaireVisited = true;
-          });
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => QuestionnairePage(
-                pageNum: 0,
-              )));
-          },
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        ListTile(
-          leading: Icon(Icons.chat ,  color: Theme.of(context).primaryColor,),
-          title: Text('Chat with business' , style: TextStyle(fontWeight: FontWeight.bold),),
-          trailing: Icon(Icons.arrow_forward_ios),
-          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-          horizontalTitleGap: 10.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+          SizedBox(
+            height: 10.0,
           ),
-          onTap: (){},
-        ),
-        SizedBox(
-          height: 10.0,
-        ),
-        ListTile(
-          leading: Icon(Icons.phone_in_talk ,  color: Theme.of(context).primaryColor,),
-          title: Text('Call Business' , style: TextStyle(fontWeight: FontWeight.bold),),
-          trailing: Icon(Icons.arrow_forward_ios),
-          tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
-          horizontalTitleGap: 10.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+          FooterTile(
+            icon: Icons.person,
+            text : 'Forms',
+            onPressed: () {
+              setState(() {
+                customQuestionnaireVisited = true;
+              });
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => QuestionnairePage(
+                        pageNum: 0,
+                      )));
+            },
           ),
-          onTap: (){},
-        ),
-      ],
+          SizedBox(
+            height: 10.0,
+          ),
+        ],
+      ),
     );
   }
 }
-

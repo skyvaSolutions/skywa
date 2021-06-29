@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/createReservationProvider.dart';
 import 'package:skywa/screens/current_sreen.dart';
-import 'package:skywa/screens/profileEditScreen.dart';
 import 'package:intl/intl.dart';
 
 Future<void> showDialogForDate(context, name, index) async {
@@ -16,10 +15,11 @@ Future<void> showDialogForDate(context, name, index) async {
       initialTime: selectedTime,
     );
     if (picked != null) selectedTime = picked;
+    var hour = picked.hour.toString().length == 1 ? "0" + picked.hour.toString() : picked.hour.toString();
     var min = picked.minute.toString().length == 1
         ? "0" + picked.minute.toString()
         : picked.minute.toString();
-    _timeController.text = picked.hour.toString() + ":" + min.toString();
+    _timeController.text = hour + ":" + min.toString();
   }
 
   final p = Provider.of<createReservationProvider>(context, listen: false);
@@ -80,18 +80,19 @@ Future<void> showDialogForDate(context, name, index) async {
             onPressed: () {
               print("here");
               print(_timeController.text);
-              DateTime now = new DateTime.now().toUtc();
+              DateTime now = new DateTime.now();
               String dateFormatted =
                   DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(now);
               String date = _timeController.text.length == 0
                   ? dateFormatted
                   : _timeController.text;
-              // Map<String, String> dateTimeFormat =
-              //     convertDateToProperFormat(now);
-              // String nowTime = dateTimeFormat['Time'];
-              // if (_timeController.text != "")
-              //   date = dateFormatted.replaceAll(
-              //       nowTime, _timeController.text + ":00");
+              Map<String, String> dateTimeFormat =
+                  convertDateToProperFormat(now);
+              String nowTime = dateTimeFormat['Time'];
+              if (_timeController.text.length != 0){
+                date = dateFormatted.replaceAll(
+                    nowTime, _timeController.text + ":00");
+              }
               print(date);
               p.createReservation(date, name, index);
               Navigator.of(context).pop();

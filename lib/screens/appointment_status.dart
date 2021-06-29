@@ -26,16 +26,20 @@ double longitude;
 bool stopDistanceTimer = false;
 bool stopArrivedTimer = false;
 
+bool isLoading = false;
+
+
 void callUpdateReservationApi(Map<String, dynamic> reservationValues) async {
   await addUpdateReservation.addUpdateRes(reservationValues);
   await getSingleReservation.getCurrentReservation();
 }
 
 List<IconData> timelineIcons = [
-  Icons.check_circle,
+  Icons.post_add,
   Icons.place,
   Icons.meeting_room,
-  Icons.airline_seat_recline_normal
+  Icons.airline_seat_recline_normal,
+  Icons.check_circle
 ];
 
 Future<void> getLocation () async {
@@ -72,7 +76,9 @@ class AppointmentStatus extends StatefulWidget {
 
 class _AppointmentStatusState extends State<AppointmentStatus> {
   Color getColor(int index) {
-    if (index == context.read<MemberStateChanged>().statusIndex) {
+    if(context.read<MemberStateChanged>().statusIndex == 4 )
+      return completeColor;
+    else if  (index == context.read<MemberStateChanged>().statusIndex) {
       return inProgressColor;
     } else if (index < context.read<MemberStateChanged>().statusIndex) {
       return completeColor;
@@ -87,11 +93,26 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
   }
 
   Future<void> checkStateAfterArrival() async {
-    if(currentReservation.currentRes.MemberState == "Arrived"){
+    if(currentReservation.currentRes.MemberState == "Arrived" || currentReservation.currentRes.MemberState == "Called to Enter" || currentReservation.currentRes.MemberState == "In Facility" ){
       await getSingleReservation.getCurrentReservation();
-      if (currentReservation.currentRes.MemberState == "Called To Enter") {
+      if(currentReservation.currentRes.MemberState == "Called to Enter"){
+        Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(2);
+        setState(() {
+
+        });
+      }
+      if(currentReservation.currentRes.MemberState == "In Facility"){
+        Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(3);
+        setState(() {
+
+        });
+      }
+      if(currentReservation.currentRes.MemberState == "Completed"){
+        Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(4);
         stopArrivedTimer = true;
-        setState(() {});
+        setState(() {
+
+        });
       }
     }
   }
@@ -104,6 +125,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           Map<String, dynamic> reservationValues = resObject();
           await addUpdateReservation.addUpdateRes(reservationValues);
           await getSingleReservation.getCurrentReservation();
+          context.watch<MemberStateChanged>().changeStatusIndex(1);
           stopDistanceTimer = true;
           setUpTimedFetch();
           setState(() {});
@@ -113,7 +135,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
   }
 
   setUpTimedFetch() {
-    Timer.periodic(Duration(milliseconds: 5000), (timer) {
+    Timer.periodic(Duration(milliseconds: 10000), (timer) {
       if (stopArrivedTimer) {
         timer.cancel();
       }
@@ -199,7 +221,10 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
                 indicatorBuilder: (_, index) {
                   var color;
                   var child;
-                  if (index == context.read<MemberStateChanged>().statusIndex) {
+                  if(context.read<MemberStateChanged>().statusIndex == 4 ){
+                   color = completeColor;
+                  }
+                  else if (index == context.read<MemberStateChanged>().statusIndex) {
                     color = inProgressColor;
                   } else if (index <
                       context.read<MemberStateChanged>().statusIndex) {
@@ -268,7 +293,6 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           ),
           StatusMessage(
             updateParent: refresh,
-            setUpTimedFetch: setUpTimedFetch,
           ),
         ],
       ),
@@ -280,7 +304,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 class StatusMessage extends StatefulWidget {
   final Function() updateParent;
   final Function() setUpTimedFetch ;
-  const StatusMessage({Key key , @required this.updateParent , @required this.setUpTimedFetch}) : super(key: key);
+  const StatusMessage({Key key , @required this.updateParent ,  this.setUpTimedFetch}) : super(key: key);
 
   @override
   _StatusMessageState createState() => _StatusMessageState();
@@ -316,36 +340,44 @@ class _StatusMessageState extends State<StatusMessage> {
           if (context.read<MemberStateChanged>().statusIndex == 0)
             Column(
               children: [
-                ListTile(
-                    title : Container(
-                      width: MediaQuery.of(context).size.width*0.6,
-                      child: Text(
-                        'Update status.',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.bold,
+                if(isLoading)
+                  CircularProgressIndicator(color: Theme.of(context).primaryColor,backgroundColor: Colors.white,),
+                if(!isLoading)
+                  ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                    tileColor: Colors.grey.withOpacity(0.3),
+                      contentPadding: EdgeInsets.all(20.0),
+                     subtitle: Text(
+                         'Arrived at the business? Click on Arrived to manually update it.',
+                       style: TextStyle(
+                         fontSize: 15.0,
+                       ),
+                     ),
+                     trailing : ElevatedButton(
+                        onPressed: ()
+                        async {
+                          print(currentReservation.currentRes.DevideID);
+                          Map<String, dynamic> reservationValues = resObject();
+                          setState(() {
+                            isLoading = true;
+                          });
+                          await addUpdateReservation.addUpdateRes(reservationValues);
+                          await getSingleReservation.getCurrentReservation();
+                          setState(() {
+                            isLoading = false;
+                          });
+                          if (currentReservation.currentRes.MemberState == "Arrived"){
+                            Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(1);
+                          }
+                          widget.updateParent();
+                        },
+                        child: Text(
+                          'Arrived',
                         ),
-                        textAlign: TextAlign.justify,
                       ),
-                    ),
-                   subtitle: Text('Arrived at the business? Click on Arrived to manually update it.'),
-                   trailing : ElevatedButton(
-                      onPressed: () async {
-                        print(currentReservation.currentRes.DevideID);
-                        Map<String, dynamic> reservationValues = resObject();
-                        await addUpdateReservation.addUpdateRes(reservationValues);
-                        await getSingleReservation.getCurrentReservation();
-                        if (currentReservation.currentRes.MemberState == "Arrived"){
-                          Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(1);
-                        }
-                        widget.setUpTimedFetch();
-                        widget.updateParent();
-                      },
-                      child: Text(
-                        'Arrived',
-                      ),
-                    ),
-                ),
+                  ),
               ],
             )
         ],
@@ -371,15 +403,18 @@ class _ButtonRowState extends State<ButtonRow> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-            IconButton(
-              onPressed: () {
-                //MapUtils.openMap(31.968599, -99.901810);
+          TextButton(
+              onPressed: (){
+               _modalBottomSheetMenu(context);
               },
-              icon: Icon(Icons.directions),
-              iconSize: 30.0,
-              color: Theme.of(context).primaryColor,
-
-            ),
+              child: Text(
+                  'Contact',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15.0,
+                ),
+              ),
+          ),
           ElevatedButton(
             onPressed: () {
               showDialog(
@@ -474,6 +509,7 @@ final _processes = [
   'Arrived',
   'Called In',
   'In Facility',
+  'Completed',
 ];
 
 final statusMess = [
@@ -481,7 +517,72 @@ final statusMess = [
   'You have arrived for the appointment. please wait near by until called.',
   'We are ready for you please walk to the entrance.',
   'Your appointment is in progress.',
+  'Your appointment is completed',
 ];
+
+
+void _modalBottomSheetMenu(BuildContext context) {
+  showModalBottomSheet(
+      context: context,
+      builder: (builder) {
+        return new Container(
+          height: MediaQuery.of(context).size.height*0.3,
+          color: Color(0xFF737373),
+          child: new Container(
+              decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.only(
+                      topLeft: const Radius.circular(10.0),
+                      topRight: const Radius.circular(10.0))),
+              child: new Center(
+                child: new Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(Icons.directions ,  color: Theme.of(context).primaryColor,),
+                      title: Text('Directions' , style: TextStyle(fontWeight: FontWeight.bold),),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                      horizontalTitleGap: 10.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onTap: (){},
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.chat ,  color: Theme.of(context).primaryColor,),
+                      title: Text('Chat with business' , style: TextStyle(fontWeight: FontWeight.bold),),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                      horizontalTitleGap: 10.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onTap: (){},
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.phone_in_talk ,  color: Theme.of(context).primaryColor,),
+                      title: Text('Call Business' , style: TextStyle(fontWeight: FontWeight.bold),),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      tileColor: Theme.of(context).primaryColor.withOpacity(0.3),
+                      horizontalTitleGap: 10.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      onTap: (){},
+                    ),
+                  ],
+                ),
+              )),
+        );
+      });
+}
+
 
 
 //Color(0xff5ec792);

@@ -4,7 +4,7 @@ import 'package:skywa/api_responses/recent_reservation.dart';
 MemberStateChanged memberStateChanged = new MemberStateChanged();
 
 class MemberStateChanged with ChangeNotifier{
-  int statusIndex ;
+  int statusIndex  = 0;
   MemberStateChanged(){
     String state = currentReservation.currentRes.MemberState;
     if (state == "Not Arrived") {
@@ -18,6 +18,9 @@ class MemberStateChanged with ChangeNotifier{
     }
     if (state == "In Facility") {
       statusIndex = 3;
+    }
+    if (state == "Completed") {
+      statusIndex = 4;
     }
   }
 

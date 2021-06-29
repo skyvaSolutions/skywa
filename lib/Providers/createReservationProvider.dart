@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/services/locationServices.dart';
@@ -12,7 +13,7 @@ class createReservationProvider with ChangeNotifier {
   void createReservation(String date, String CompanyName, int index) async {
     var uuid = Uuid();
     String deviceId = userSettings.deviceID.value;
-    String startTime = DateTime.now().toString();
+    String startTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now());
     Location l = new Location();
     await l.getCurrentLocation();
     double lat = l.p.latitude;
@@ -43,10 +44,10 @@ class createReservationProvider with ChangeNotifier {
       "NumberOfPeopleOnReservation": "1",
       // "ReservationCreatedTimeStamp": "notSet",
       "LocationName": CompanyName,
-      "Address": " 17 Blake Rd, Nassau, Bahamas",
-      "CompanyLogoURL": "DoctorsHospitalWest.jpg",
-      "QName": "Main Entrance",
-      "AuthorizedUsers": [],
+      // "Address": " 17 Blake Rd, Nassau, Bahamas",
+      // "CompanyLogoURL": "DoctorsHospitalWest.jpg",
+      // "QName": "Main Entrance",
+      // "AuthorizedUsers": [],
       "AttendeeData": [],
       "CompanyName": CompanyName
     };

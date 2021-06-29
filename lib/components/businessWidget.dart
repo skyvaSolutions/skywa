@@ -1,20 +1,37 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
-  final name, address , index;
-  const BusinessWidget({Key key, this.name, this.address , this.index}) : super(key: key);
+  final name, address, index;
+  const BusinessWidget({Key key, this.name, this.address, this.index})
+      : super(key: key);
   @override
   _BusinessWidgetState createState() => _BusinessWidgetState();
 }
 
 class _BusinessWidgetState extends State<BusinessWidget> {
+  String getInitials(company_name) {
+    List<String> names = company_name.split(" ");
+    String initials = "";
+    int numWords = 2;
+
+    if (numWords < names.length) {
+      numWords = names.length;
+    }
+    for (var i = 0; i < numWords; i++) {
+      initials += '${names[i][0]}';
+    }
+    return initials;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.38,
+      height: MediaQuery.of(context).size.height * 0.36,
       width: MediaQuery.of(context).size.width * 0.9,
       child: Card(
         shape: RoundedRectangleBorder(
@@ -59,8 +76,11 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                         width: 90,
                         height: 90,
                       ),
-                      imageUrl:
-                          "https://4.imimg.com/data4/NL/MG/MY-14358752/2-pcs-copy-500x500.png",
+                      imageUrl: [
+                        "http://nebula.wsimg.com/f8718f1686ddf5364fb59d810396dfd8?AccessKeyId=7308F00505C458ECD224&disposition=0&alloworigin=1",
+                        "https://images1-fabric.practo.com/practices/1255057/dr-maneesha-singh-clinic-gynaecologist-ghaziabad-5cc44e9a814e8.jpg",
+                        "https://www.thedoctorsclinic.com/images/content/Cardiology%20Waiting%20Room.jpg"
+                      ][widget.index % 3],
                       height: MediaQuery.of(context).size.height * 0.20,
                       width: MediaQuery.of(context).size.width,
                       fit: BoxFit.fill,
@@ -70,16 +90,25 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                       left: 20,
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.11,
-                        width: MediaQuery.of(context).size.width * 0.21,
+                        width: MediaQuery.of(context).size.width * 0.19,
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Colors.red),
-                            borderRadius: BorderRadius.circular(100),
-                            image: DecorationImage(
-                                scale: 1,
-                                image: NetworkImage(
-                                    "https://image.shutterstock.com/image-vector/medical-care-logo-design-260nw-1281695074.jpg"),
-                                fit: BoxFit.scaleDown)),
+                          color: [
+                            Colors.orange,
+                            Colors.purple,
+                            Colors.teal,
+                            Colors.red
+                          ][widget.index % 4],
+                          border: Border.all(color: Colors.red),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Center(
+                          child: Text(
+                            getInitials(widget.name),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                                color: Colors.white, fontSize: 18),
+                          ),
+                        ),
                       ),
                     )
                   ],
@@ -118,7 +147,8 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () async {
-                        await showMyDialog(context, widget.name.toString() , widget.index);
+                        await showMyDialog(
+                            context, widget.name.toString(), widget.index);
                       },
                       child: Text("Check In"),
                     )

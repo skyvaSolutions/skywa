@@ -8,7 +8,9 @@ class DB {
   static const String phone = 'phone'; //string
   static const String gender = 'gender'; //string
   static const String token = 'token'; //string
-  static const String fcmToken = 'fcmToken'; //string
+  static const String fcmToken = 'fcmToken';//string
+  static const String countryCallingCode = "1";
+  static const int index = 0;
 
 //
 }

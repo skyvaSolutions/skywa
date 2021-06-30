@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skywa/DB/DB.dart';
 import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
@@ -13,20 +14,21 @@ class BusinessWidget extends StatefulWidget {
   _BusinessWidgetState createState() => _BusinessWidgetState();
 }
 
-class _BusinessWidgetState extends State<BusinessWidget> {
-  String getInitials(company_name) {
-    List<String> names = company_name.split(" ");
-    String initials = "";
-    int numWords = 2;
+String getInitials(company_name) {
+  List<String> names = company_name.split(" ");
+  String initials = "";
+  int numWords = 2;
 
-    if (numWords < names.length) {
-      numWords = names.length;
-    }
-    for (var i = 0; i < numWords; i++) {
-      initials += '${names[i][0]}';
-    }
-    return initials;
+  if (numWords < names.length) {
+    numWords = names.length;
   }
+  for (var i = 0; i < numWords; i++) {
+    initials += '${names[i][0]}';
+  }
+  return initials;
+}
+
+class _BusinessWidgetState extends State<BusinessWidget> {
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +149,7 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                             borderRadius: BorderRadius.circular(5)),
                       ),
                       onPressed: () async {
+                        DB.box.put(DB.index, widget.index);
                         await showMyDialog(
                             context, widget.name.toString(), widget.index);
                       },

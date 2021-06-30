@@ -8,6 +8,7 @@ import 'package:skywa/api_calls/delete_reservation.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_calls/q_meta_data.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
+import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/services/locationServices.dart';
 import 'package:timelines/timelines.dart';
 
@@ -70,6 +71,8 @@ Future<void> getLocation () async {
 }
 
 class AppointmentStatus extends StatefulWidget {
+  final Function() notifyGrandParent;
+  const AppointmentStatus({Key key ,@required this.notifyGrandParent}) : super(key: key);
   @override
   _AppointmentStatusState createState() => _AppointmentStatusState();
 }
@@ -293,6 +296,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           ),
           StatusMessage(
             updateParent: refresh,
+            notifyGrandParent: widget.notifyGrandParent,
           ),
         ],
       ),
@@ -304,7 +308,8 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 class StatusMessage extends StatefulWidget {
   final Function() updateParent;
   final Function() setUpTimedFetch ;
-  const StatusMessage({Key key , @required this.updateParent ,  this.setUpTimedFetch}) : super(key: key);
+  final Function() notifyGrandParent;
+  const StatusMessage({Key key , @required this.updateParent ,  this.setUpTimedFetch , @required this.notifyGrandParent}) : super(key: key);
 
   @override
   _StatusMessageState createState() => _StatusMessageState();
@@ -379,6 +384,33 @@ class _StatusMessageState extends State<StatusMessage> {
                       ),
                   ),
               ],
+            ),
+          if(context.read<MemberStateChanged>().statusIndex == 4)
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              tileColor: Colors.grey.withOpacity(0.3),
+              contentPadding: EdgeInsets.all(20.0),
+              subtitle: Text(
+                'Your appointment is completed. Update your current reservation',
+                style: TextStyle(
+                  fontSize: 15.0,
+                ),
+              ),
+              trailing : ElevatedButton(
+                onPressed: ()
+                async {
+                  todayRes = [];
+                  widget.notifyGrandParent();
+                },
+                child: Text(
+                  'Update',
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.teal)
+                ),
+              ),
             )
         ],
       ),
@@ -469,6 +501,7 @@ class _ButtonRowState extends State<ButtonRow> {
                         ElevatedButton(
                           onPressed: () async {
                             await deleteReservation.deleteRes();
+                            todayRes = [];
                             stopArrivedTimer = true;
                             stopDistanceTimer = true;
                             widget.notifyParent();

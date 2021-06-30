@@ -3,12 +3,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:skywa/DB/DB.dart';
 import 'package:skywa/Providers/member_state_changed.dart';
 import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/api_responses/reservations.dart';
+import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/footer_tile.dart';
+import 'package:skywa/components/show_more_info_dailog.dart';
 import 'package:skywa/model/reservation.dart';
 import 'package:skywa/screens/appointment_status.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
@@ -20,9 +23,11 @@ bool customQuestionnaireVisited = false;
 
 Future<void> _future;
 
+List<Reservation> todayRes = [];
+
 Future<void> getAndSortReservations() async {
   await getMyReservations.findReservations();
-  List<Reservation> todayRes = [];
+  isReservationToday = false;
   if (myReservations.noReservations == false) {
     for (int i = 0; i < myReservations.reservationsList.length; i++) {
       if(myReservations.reservationsList[i].MemberState != 'Completed') {
@@ -119,7 +124,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
               return Center(child: Text(snapshot.error.toString()));
             } else {
               if (myReservations.noReservations == true ||
-                  isReservationToday == false) {
+                  isReservationToday == false || todayRes.length == 0) {
                 return Container(
                   alignment: Alignment.center,
                   child: Column(
@@ -168,7 +173,9 @@ class _CurrentScreenState extends State<CurrentScreen> {
                       SizedBox(
                         height: 10.0,
                       ),
-                      AppointmentStatus(),
+                      AppointmentStatus(
+                        notifyGrandParent: setUpApiCall,
+                      ),
                       Footer(),
                     ],
                   ),
@@ -198,16 +205,26 @@ class _HeaderState extends State<Header> {
         Row(
           children: [
             Container(
+              margin: EdgeInsets.only(left: 10.0),
               height: 80.0,
               width: 80.0,
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(100),
-                  image: DecorationImage(
-                      scale: 1,
-                      image: NetworkImage(
-                          "https://image.shutterstock.com/image-vector/medical-care-logo-design-260nw-1281695074.jpg"),
-                      fit: BoxFit.scaleDown)),
+                  color:  [
+                  Colors.orange,
+                  Colors.purple,
+                  Colors.teal,
+                  Colors.red
+                  ][DB.box.get(DB.index) % 4],
+                  borderRadius: BorderRadius.circular(80),
+                  ),
+              child: Center(
+                child: Text(
+                  getInitials(currentReservation.currentRes.CompanyName),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      color: Colors.white, fontSize: 18),
+                ),
+              ),
             ),
             SizedBox(
               width: 10.0,
@@ -218,12 +235,15 @@ class _HeaderState extends State<Header> {
                 SizedBox(
                   height: 8.0,
                 ),
-                Text(
-                  currentReservation.currentRes.CompanyName,
-                  style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor),
+                Container(
+                  width: MediaQuery.of(context).size.width*0.5,
+                  child: Text(
+                    currentReservation.currentRes.CompanyName,
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
+                  ),
                 ),
                 SizedBox(width: 5.0,),
                 SizedBox(
@@ -321,7 +341,13 @@ class _FooterState extends State<Footer> {
           FooterTile(
             icon: Icons.info,
             text: 'More Information',
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return CustomDialog();
+                  });
+            },
           ),
           SizedBox(
             height: 10.0,

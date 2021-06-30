@@ -1,3 +1,4 @@
+import 'package:skywa/DB/DB.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geocoder/model.dart';
@@ -40,8 +41,9 @@ class Location {
     location = addresses.first.addressLine;
     country = addresses.first.countryCode;
     await countryCallingCode.findCountryCallingCode();
-    print(countryCallingCode.countryCallingCodeMap[country]);
     countryPhoneCode = countryCallingCode.countryCallingCodeMap[country];
+    DB.box.put(DB.countryCallingCode, countryPhoneCode);
+
     return true;
   }
 }

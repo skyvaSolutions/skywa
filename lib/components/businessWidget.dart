@@ -8,7 +8,8 @@ import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
   final name, address, index;
-  const BusinessWidget({Key key, this.name, this.address, this.index})
+  final Function goToCurrentScreen;
+  const BusinessWidget({Key key, this.name, this.address, this.index , @required this.goToCurrentScreen})
       : super(key: key);
   @override
   _BusinessWidgetState createState() => _BusinessWidgetState();
@@ -92,15 +93,12 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                       left: 20,
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.11,
-                        width: MediaQuery.of(context).size.width * 0.19,
+                        width: MediaQuery.of(context).size.height * 0.11,
                         decoration: BoxDecoration(
                           color: [
-                            Colors.orange,
-                            Colors.purple,
-                            Colors.teal,
-                            Colors.red
-                          ][widget.index % 4],
-                          border: Border.all(color: Colors.red),
+                            Color(0xFF4C44B3),
+                            Color(0xFF3CD1BB),
+                          ][widget.index % 2],
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Center(
@@ -151,7 +149,7 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                       onPressed: () async {
                         DB.box.put(DB.index, widget.index);
                         await showMyDialog(
-                            context, widget.name.toString(), widget.index);
+                            context, widget.name.toString(), widget.index , widget.goToCurrentScreen);
                       },
                       child: Text("Check In"),
                     )

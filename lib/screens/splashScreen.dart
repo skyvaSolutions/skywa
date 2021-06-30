@@ -21,7 +21,6 @@ import 'package:skywa/services/locationServices.dart';
 import 'package:skywa/services/qAPIServices.dart';
 import 'package:skywa/services/releaseStatusService.dart';
 import 'package:skywa/services/userServices.dart';
-
 class SplashScreen extends StatefulWidget {
   static const String id = 'splashScreen';
   @override
@@ -47,7 +46,9 @@ class _SplashScreenState extends State<SplashScreen> {
     getDeviceInfo(context);
     return Scaffold(
       body: Center(
-        child: Image.asset('assets/images/icon white background.png'),
+        child: Container(
+            child: Image.asset('assets/images/logo example.png'),
+        ),
       ),
     );
   }

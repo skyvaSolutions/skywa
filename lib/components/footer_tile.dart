@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skywa/main.dart';
 
 class FooterTile extends StatefulWidget {
   final Function() onPressed;
@@ -41,7 +42,7 @@ class _FooterTileState extends State<FooterTile> {
               style: TextStyle(
                 fontSize: 15.0,
                 fontWeight: FontWeight.bold,
-                color: Colors.black
+
               ),
             ),
             Spacer(),

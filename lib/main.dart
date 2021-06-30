@@ -33,6 +33,26 @@ void main() async {
   ], child: MyApp()));
 }
 
+const FlexSchemeData customFlexScheme = FlexSchemeData(
+  name: 'Toledo purple',
+  description: 'Purple theme created from custom defined colors.',
+  light: FlexSchemeColor(
+    primary: Color(0xFF4C44B3),
+    primaryVariant: Color(0xFF383285),
+    secondary: Color(0xFF3CD1BB),
+    secondaryVariant: Color(0xFF31A191),
+    accentColor: Color(0xFF3CD1BB),
+    error: Color(0xFFEDAF11),
+  ),
+  dark: FlexSchemeColor(
+    primary: Color(0xFF9E7389),
+    primaryVariant: Color(0xFF775C69),
+    secondary: Color(0xFF738F81),
+    secondaryVariant: Color(0xFF5C7267),
+  ),
+);
+
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -42,7 +62,7 @@ class MyApp extends StatelessWidget {
         title: 'App Template',
         debugShowCheckedModeBanner: false,
         themeMode: _prov.DarkMode == true ? ThemeMode.dark : ThemeMode.light,
-        theme: FlexColorScheme.light(scheme: FlexScheme.hippieBlue).toTheme,
+        theme: FlexColorScheme.light(colors: customFlexScheme.light).toTheme,
         darkTheme: FlexColorScheme.dark(scheme: FlexScheme.hippieBlue
                 //  fontFamily: 'Georgia',
                 )

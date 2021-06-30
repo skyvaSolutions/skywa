@@ -5,7 +5,7 @@ import 'package:skywa/Providers/createReservationProvider.dart';
 import 'package:skywa/screens/current_sreen.dart';
 import 'package:intl/intl.dart';
 
-Future<void> showDialogForDate(context, name, index) async {
+Future<void> showDialogForDate(contextParent, name, index  , goToCurrentScreen) async {
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
   TextEditingController _timeController = TextEditingController();
 
@@ -22,9 +22,9 @@ Future<void> showDialogForDate(context, name, index) async {
     _timeController.text = hour + ":" + min.toString();
   }
 
-  final p = Provider.of<createReservationProvider>(context, listen: false);
+  final p = Provider.of<createReservationProvider>(contextParent, listen: false);
   return showDialog<void>(
-    context: context,
+    context: contextParent,
     barrierDismissible: true, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
@@ -94,7 +94,7 @@ Future<void> showDialogForDate(context, name, index) async {
                     nowTime, _timeController.text + ":00");
               }
               print(date);
-              p.createReservation(date, name, index);
+              p.createReservation(contextParent , date, name, index , goToCurrentScreen);
               Navigator.of(context).pop();
             },
           ),

@@ -30,8 +30,7 @@ Future<void> getAndSortReservations() async {
   isReservationToday = false;
   if (myReservations.noReservations == false) {
     for (int i = 0; i < myReservations.reservationsList.length; i++) {
-      if(myReservations.reservationsList[i].MemberState != 'Completed') {
-
+      if(myReservations.reservationsList[i].MemberState.compareTo("Completed") != 0) {
         DateTime today = DateTime.now();
         int todayDay = today.day;
         int todayMonth = today.month;
@@ -209,12 +208,10 @@ class _HeaderState extends State<Header> {
               height: 80.0,
               width: 80.0,
               decoration: BoxDecoration(
-                  color:  [
-                  Colors.orange,
-                  Colors.purple,
-                  Colors.teal,
-                  Colors.red
-                  ][DB.box.get(DB.index) % 4],
+                color: [
+                  Color(0xFF4C44B3),
+                  Color(0xFF3CD1BB),
+                ][DB.box.get(DB.index) %  2],
                   borderRadius: BorderRadius.circular(80),
                   ),
               child: Center(
@@ -345,7 +342,7 @@ class _FooterState extends State<Footer> {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return CustomDialog();
+                    return CustomDialog(companyName: currentReservation.currentRes.CompanyName,);
                   });
             },
           ),

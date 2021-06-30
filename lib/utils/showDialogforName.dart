@@ -4,11 +4,11 @@ import 'package:hive/hive.dart';
 import 'package:skywa/DB/DB.dart';
 import 'package:skywa/utils/showDialogforDate.dart';
 
-Future<void> showMyDialog(context, name , index) async {
+Future<void> showMyDialog(contextParent, name , index , goToCurrentScreen) async {
   TextEditingController t1 = new TextEditingController();
   DB.box.get(DB.name) != null ? t1.text = DB.box.get(DB.name) : "";
   return showDialog<void>(
-    context: context,
+    context: contextParent,
     barrierDismissible: true, // user must tap button!
     builder: (BuildContext context) {
       return AlertDialog(
@@ -51,7 +51,7 @@ Future<void> showMyDialog(context, name , index) async {
             onPressed: () {
               DB.box.put(DB.name, t1.text);
               Navigator.of(context).pop();
-              showDialogForDate(context, name , index);
+              showDialogForDate(contextParent, name , index , goToCurrentScreen);
             },
           ),
         ],

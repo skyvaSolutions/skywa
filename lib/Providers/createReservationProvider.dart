@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
+import 'package:skywa/components/show_more_info_dailog.dart';
+import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/services/locationServices.dart';
 import 'package:uuid/uuid.dart';
 import 'package:dio/dio.dart';
 
 class createReservationProvider with ChangeNotifier {
-  void createReservation(String date, String CompanyName, int index) async {
+  void createReservation(BuildContext context ,String date, String CompanyName, int index , Function() gotToCurrentScreen) async {
     var uuid = Uuid();
     String deviceId = userSettings.deviceID.value;
     String startTime = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now());
@@ -57,5 +59,9 @@ class createReservationProvider with ChangeNotifier {
         "https://shoeboxtx.veloxe.com:36251/api/AddorUpdateReservationPost",
         data: data);
     print(response.data);
+    getAndSortReservations();
+    showDialog(context: context, builder: (BuildContext context){
+      return CustomDialog( goToCurrentScreen : gotToCurrentScreen,companyName: CompanyName,);
+    });
   }
 }

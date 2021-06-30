@@ -36,13 +36,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int selectedPage = 0;
 
   final _pageOptions = [HomeBar(), CurrentScreen(), HomeBar()];
   StreamSubscription _connectionChangeStream;
   @override
   void initState() {
     super.initState();
+  }
+
+  goToCurrentScreen(){
+    setState(() {
+      _selected = 1;
+    });
   }
 
   @override
@@ -58,8 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   int _selected = 0;
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
-  List<Widget> body = [HomeBar(), CurrentScreen(), Appointment()];
+  List<Widget> body = [];
   Widget build(BuildContext context) {
+    body = [HomeBar(goToCurrentScreen: goToCurrentScreen), CurrentScreen(), Appointment()];
     return Scaffold(
         // extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -131,11 +137,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class HomeBar extends StatelessWidget {
-  const HomeBar({
-    Key key,
-  }) : super(key: key);
+class HomeBar extends StatefulWidget {
+  final Function() goToCurrentScreen;
+  const HomeBar({Key key, @required this.goToCurrentScreen}) : super(key: key);
 
+  @override
+  _HomeBarState createState() => _HomeBarState();
+}
+
+class _HomeBarState extends State<HomeBar> {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -148,6 +158,7 @@ class HomeBar extends StatelessWidget {
               name: nearbyQs[index].companyName,
               address: nearbyQs[index].address,
               index: index,
+              goToCurrentScreen: widget.goToCurrentScreen,
             ),
           );
         });

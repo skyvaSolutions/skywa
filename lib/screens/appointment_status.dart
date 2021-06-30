@@ -14,11 +14,13 @@ import 'package:timelines/timelines.dart';
 
 const kTileHeight = 50.0;
 
-const completeColor = Colors.teal;
+const completeColor = Color(0xFF4C44B3);
 
-const inProgressColor = Color(0xFFFFA63C);
+const inProgressColor = Color(0xFF3CD1BB);
 
-const todoColor = Color(0xffd1d2d7);
+const todoColor = Color(0xFFD4D3EE);
+
+const cancelColor = Color(0xFFEDAF11);
 
 double latitude;
 
@@ -39,7 +41,7 @@ List<IconData> timelineIcons = [
   Icons.post_add,
   Icons.place,
   Icons.meeting_room,
-  Icons.airline_seat_recline_normal,
+  Icons.people_sharp,
   Icons.check_circle
 ];
 
@@ -329,7 +331,7 @@ class _StatusMessageState extends State<StatusMessage> {
               borderRadius: BorderRadius.all(
                 Radius.circular(10.0),
               ),
-              color: Color(0xFFFFA63C),
+              color:  inProgressColor,
             ),
             child: Text(
               statusMess[context.read<MemberStateChanged>().statusIndex],
@@ -352,7 +354,7 @@ class _StatusMessageState extends State<StatusMessage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0),
                     ),
-                    tileColor: Colors.grey.withOpacity(0.3),
+                    tileColor: todoColor,
                       contentPadding: EdgeInsets.all(20.0),
                      subtitle: Text(
                          'Arrived at the business? Click on Arrived to manually update it.',
@@ -390,7 +392,7 @@ class _StatusMessageState extends State<StatusMessage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4.0),
               ),
-              tileColor: Colors.grey.withOpacity(0.3),
+              tileColor: todoColor,
               contentPadding: EdgeInsets.all(20.0),
               subtitle: Text(
                 'Your appointment is completed. Update your current reservation',
@@ -408,7 +410,7 @@ class _StatusMessageState extends State<StatusMessage> {
                   'Update',
                 ),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.teal)
+                  backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor)
                 ),
               ),
             )
@@ -462,7 +464,7 @@ class _ButtonRowState extends State<ButtonRow> {
                             Icon(
                               Icons.warning_amber_rounded,
                               size: 50.0,
-                              color: Colors.redAccent,
+                              color: cancelColor,
                             ),
                             SizedBox(
                               height: 20.0,
@@ -472,7 +474,6 @@ class _ButtonRowState extends State<ButtonRow> {
                               style: TextStyle(
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.grey[850],
                               ),
                             ),
                             SizedBox(
@@ -482,7 +483,6 @@ class _ButtonRowState extends State<ButtonRow> {
                               'Are you sure you want to permanently delete this Reservation.',
                               style: TextStyle(
                                 fontSize: 15.0,
-                                color: Colors.grey[800],
                               ),
                             )
                           ],
@@ -515,7 +515,7 @@ class _ButtonRowState extends State<ButtonRow> {
                           ),
                           style: ButtonStyle(
                             backgroundColor:
-                            MaterialStateProperty.all(Colors.redAccent),
+                            MaterialStateProperty.all(cancelColor),
                           ),
                         )
                       ],
@@ -528,7 +528,7 @@ class _ButtonRowState extends State<ButtonRow> {
             ),
             style: ButtonStyle(
                 backgroundColor:
-                MaterialStateProperty.all(Colors.redAccent)),
+                MaterialStateProperty.all(cancelColor)),
           ),
         ],
       ),

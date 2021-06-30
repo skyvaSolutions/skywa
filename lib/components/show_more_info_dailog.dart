@@ -5,14 +5,24 @@ import 'package:skywa/DB/DB.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/components/businessWidget.dart';
 
-class CustomDialog extends StatelessWidget {
-  
+class CustomDialog extends StatefulWidget {
+  final Function() goToCurrentScreen;
+  final companyName;
+  const CustomDialog({Key key , this.goToCurrentScreen , @required this.companyName}) : super(key: key);
 
+  @override
+  _CustomDialogState createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       actions: [
-        ElevatedButton(onPressed: (){Navigator.pop(context);}, child: Text('Done'))
+        ElevatedButton(onPressed: (){
+          if(widget.goToCurrentScreen != null)
+            widget.goToCurrentScreen();
+          Navigator.pop(context);}, child: Text('Done'))
       ],
       content: Container(
         width: double.infinity,
@@ -34,15 +44,13 @@ class CustomDialog extends StatelessWidget {
                 decoration: new BoxDecoration(
                   shape: BoxShape.circle,
                   color: [
-                    Colors.orange,
-                    Colors.purple,
-                    Colors.teal,
-                    Colors.red
-                  ][DB.box.get(DB.index) % 4],
+                    Color(0xFF4C44B3),
+                    Color(0xFF3CD1BB),
+                  ][DB.box.get(DB.index) % 2],
                 ),
                 child: Center(
                   child: Text(
-                    getInitials(currentReservation.currentRes.CompanyName),
+                    getInitials(widget.companyName),
                     textAlign: TextAlign.center,
                     style:
                         GoogleFonts.poppins(color: Colors.white, fontSize: 18),
@@ -58,7 +66,7 @@ class CustomDialog extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    currentReservation.currentRes.CompanyName,
+                    widget.companyName,
                     style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,

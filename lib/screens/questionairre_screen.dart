@@ -7,6 +7,7 @@ import 'package:skywa/Providers/ThemeProvider.dart';
 import 'package:skywa/components/questionnaire_one.dart';
 import 'package:skywa/components/questionnaire_three.dart';
 import 'package:skywa/components/questionnaire_two.dart';
+import 'package:skywa/main.dart';
 
 class QuestionnairePage extends StatefulWidget {
   final int pageNum ;
@@ -27,7 +28,7 @@ class _QuestionnairePageState extends State<QuestionnairePage> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: _prov.DarkMode == true ? ThemeMode.dark : ThemeMode.light,
-      theme: FlexColorScheme.light(scheme: FlexScheme.hippieBlue).toTheme,
+      theme: FlexColorScheme.light(colors: customFlexScheme.light).toTheme,
       darkTheme: FlexColorScheme.dark(scheme: FlexScheme.hippieBlue
         //  fontFamily: 'Georgia',
       ).toTheme,

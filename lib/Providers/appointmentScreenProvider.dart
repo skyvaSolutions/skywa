@@ -46,13 +46,14 @@ class appointmentScreenProvider with ChangeNotifier {
         // } else {
         //   _upcomingReservation.add(Reservation.fromJson(d[i]));
         // }
-        if(d[i]["MemberState"] == "Completed")
+        if (d[i]["MemberState"] == "Completed")
           _pastReservation.add(Reservation.fromJson(d[i]));
-        else if(d[i]["MemberState"] == "Not Arrived")
+        else if (d[i]["MemberState"] == "Not Arrived")
           _upcomingReservation.add(Reservation.fromJson(d[i]));
         else
           _activeReservation.add(Reservation.fromJson(d[i]));
       }
     }
+    notifyListeners();
   }
 }

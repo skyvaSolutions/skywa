@@ -36,7 +36,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   final _pageOptions = [HomeBar(), CurrentScreen(), HomeBar()];
   StreamSubscription _connectionChangeStream;
   @override
@@ -44,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  goToCurrentScreen(){
+  goToCurrentScreen() {
     setState(() {
       _selected = 1;
     });
@@ -65,7 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
   List<Widget> body = [];
   Widget build(BuildContext context) {
-    body = [HomeBar(goToCurrentScreen: goToCurrentScreen), CurrentScreen(), Appointment()];
+    body = [
+      HomeBar(goToCurrentScreen: goToCurrentScreen),
+      CurrentScreen(),
+      Appointment()
+    ];
     return Scaffold(
         // extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -148,20 +151,25 @@ class HomeBar extends StatefulWidget {
 class _HomeBarState extends State<HomeBar> {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(4),
-        itemCount: nearbyQs.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: const EdgeInsets.only(left: 3, right: 3, top: 8.0),
-            child: BusinessWidget(
-              name: nearbyQs[index].companyName,
-              address: nearbyQs[index].address,
-              index: index,
-              goToCurrentScreen: widget.goToCurrentScreen,
-            ),
-          );
-        });
+    return RefreshIndicator(
+      onRefresh: () async {
+        print("Refreshing");
+      },
+      child: ListView.builder(
+          padding: const EdgeInsets.all(4),
+          itemCount: nearbyQs.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 3, right: 3, top: 8.0),
+              child: BusinessWidget(
+                name: nearbyQs[index].companyName,
+                address: nearbyQs[index].address,
+                index: index,
+                goToCurrentScreen: widget.goToCurrentScreen,
+              ),
+            );
+          }),
+    );
   }
 }
 

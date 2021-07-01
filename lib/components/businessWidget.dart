@@ -9,7 +9,12 @@ import 'package:skywa/utils/showDialogforName.dart';
 class BusinessWidget extends StatefulWidget {
   final name, address, index;
   final Function goToCurrentScreen;
-  const BusinessWidget({Key key, this.name, this.address, this.index , @required this.goToCurrentScreen})
+  const BusinessWidget(
+      {Key key,
+      this.name,
+      this.address,
+      this.index,
+      @required this.goToCurrentScreen})
       : super(key: key);
   @override
   _BusinessWidgetState createState() => _BusinessWidgetState();
@@ -23,14 +28,17 @@ String getInitials(company_name) {
   if (numWords < names.length) {
     numWords = names.length;
   }
+  if (names.length == 1) {
+    numWords = 1;
+  }
   for (var i = 0; i < numWords; i++) {
+    print(names[i]);
     initials += '${names[i][0]}';
   }
   return initials;
 }
 
 class _BusinessWidgetState extends State<BusinessWidget> {
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -103,7 +111,9 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                         ),
                         child: Center(
                           child: Text(
-                            getInitials(widget.name),
+                            widget.name.toString().length == 0
+                                ? ""
+                                : getInitials(widget.name),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                                 color: Colors.white, fontSize: 18),
@@ -148,8 +158,8 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                       ),
                       onPressed: () async {
                         DB.box.put(DB.index, widget.index);
-                        await showMyDialog(
-                            context, widget.name.toString(), widget.index , widget.goToCurrentScreen);
+                        await showMyDialog(context, widget.name.toString(),
+                            widget.index, widget.goToCurrentScreen);
                       },
                       child: Text("Check In"),
                     )

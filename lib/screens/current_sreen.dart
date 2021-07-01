@@ -30,7 +30,9 @@ Future<void> getAndSortReservations() async {
   isReservationToday = false;
   if (myReservations.noReservations == false) {
     for (int i = 0; i < myReservations.reservationsList.length; i++) {
-      if(myReservations.reservationsList[i].MemberState.compareTo("Completed") != 0) {
+      if (myReservations.reservationsList[i].MemberState
+              .compareTo("Completed") !=
+          0) {
         DateTime today = DateTime.now();
         int todayDay = today.day;
         int todayMonth = today.month;
@@ -47,7 +49,6 @@ Future<void> getAndSortReservations() async {
           print(myReservations.reservationsList[i].MemberState);
           todayRes.add(myReservations.reservationsList[i]);
         }
-
       }
     }
     print(todayRes.length);
@@ -123,7 +124,8 @@ class _CurrentScreenState extends State<CurrentScreen> {
               return Center(child: Text(snapshot.error.toString()));
             } else {
               if (myReservations.noReservations == true ||
-                  isReservationToday == false || todayRes.length == 0) {
+                  isReservationToday == false ||
+                  todayRes.length == 0) {
                 return Container(
                   alignment: Alignment.center,
                   child: Column(
@@ -208,18 +210,14 @@ class _HeaderState extends State<Header> {
               height: 80.0,
               width: 80.0,
               decoration: BoxDecoration(
-                color: [
-                  Color(0xFF4C44B3),
-                  Color(0xFF3CD1BB),
-                ][DB.box.get(DB.index) %  2],
-                  borderRadius: BorderRadius.circular(80),
-                  ),
+                color: Color(0xFF3CD1BB),
+                borderRadius: BorderRadius.circular(80),
+              ),
               child: Center(
                 child: Text(
                   getInitials(currentReservation.currentRes.CompanyName),
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                      color: Colors.white, fontSize: 18),
+                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 18),
                 ),
               ),
             ),
@@ -233,7 +231,7 @@ class _HeaderState extends State<Header> {
                   height: 8.0,
                 ),
                 Container(
-                  width: MediaQuery.of(context).size.width*0.5,
+                  width: MediaQuery.of(context).size.width * 0.5,
                   child: Text(
                     currentReservation.currentRes.CompanyName,
                     style: TextStyle(
@@ -242,7 +240,9 @@ class _HeaderState extends State<Header> {
                         color: Theme.of(context).primaryColor),
                   ),
                 ),
-                SizedBox(width: 5.0,),
+                SizedBox(
+                  width: 5.0,
+                ),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -342,7 +342,9 @@ class _FooterState extends State<Footer> {
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return CustomDialog(companyName: currentReservation.currentRes.CompanyName,);
+                    return CustomDialog(
+                      companyName: currentReservation.currentRes.CompanyName,
+                    );
                   });
             },
           ),
@@ -351,7 +353,7 @@ class _FooterState extends State<Footer> {
           ),
           FooterTile(
             icon: Icons.person,
-            text : 'Forms',
+            text: 'Forms',
             onPressed: () {
               setState(() {
                 customQuestionnaireVisited = true;

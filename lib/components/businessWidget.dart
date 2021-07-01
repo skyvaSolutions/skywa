@@ -151,11 +151,11 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                             fontSize: 15.2, fontWeight: FontWeight.w300),
                       ),
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                      ),
+                    MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          side:
+                              BorderSide(color: Theme.of(context).primaryColor),
+                          borderRadius: BorderRadius.circular(25)),
                       onPressed: () async {
                         DB.box.put(DB.index, widget.index);
                         await showMyDialog(context, widget.name.toString(),

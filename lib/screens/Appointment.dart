@@ -15,15 +15,11 @@ class _AppointmentState extends State<Appointment> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      final p = Provider.of<appointmentScreenProvider>(context, listen: false);
-      p.getReservations();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final pa = Provider.of<appointmentScreenProvider>(context);
+    final pa = Provider.of<appointmentScreenProvider>(context, listen: false);
     return DefaultTabController(
       initialIndex: 1,
       length: 3,
@@ -47,19 +43,38 @@ class _AppointmentState extends State<Appointment> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: <Widget>[
-            Upcoming(
-              list: pa.upcomingRes,
-            ),
-            Upcoming(
-              list: pa.pastRes,
-            ),
-            Upcoming(
-              list: pa.activeRes,
-            ),
-          ],
-        ),
+        body: FutureBuilder<bool>(
+            future:
+                Provider.of<appointmentScreenProvider>(context, listen: false)
+                    .getReservations(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return Text(
+                    'Fetching data',
+                    textAlign: TextAlign.center,
+                  );
+                case ConnectionState.active:
+                  return Text('');
+                case ConnectionState.waiting:
+                  return Text("Fetching Data...");
+                case ConnectionState.done:
+                  return TabBarView(
+                    children: <Widget>[
+                      Upcoming(
+                        list: pa.upcomingRes,
+                      ),
+                      Upcoming(
+                        list: pa.pastRes,
+                      ),
+                      Upcoming(
+                        list: pa.activeRes,
+                      ),
+                    ],
+                  );
+              }
+              return Text("Fetching Chucky Categories...");
+            }),
       ),
     );
     ;

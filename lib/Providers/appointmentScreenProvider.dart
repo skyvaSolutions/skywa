@@ -15,7 +15,7 @@ class appointmentScreenProvider with ChangeNotifier {
   List get upcomingRes => _upcomingReservation;
   List get activeRes => _activeReservation;
 
-  void getReservations() async {
+  Future<bool> getReservations() async {
     var id = userSettings.deviceID.value;
     _upcomingReservation = [];
     _pastReservation = [];
@@ -54,6 +54,6 @@ class appointmentScreenProvider with ChangeNotifier {
           _activeReservation.add(Reservation.fromJson(d[i]));
       }
     }
-    notifyListeners();
+    return true;
   }
 }

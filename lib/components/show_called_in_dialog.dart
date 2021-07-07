@@ -1,28 +1,36 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:skywa/DB/DB.dart';
+import 'package:skywa/Providers/appointmentScreenProvider.dart';
+import 'package:skywa/Providers/appointment_tap_provider.dart';
+import 'package:skywa/api_calls/get_my_reservations.dart';
+import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
+import 'package:skywa/api_responses/reservations.dart';
 import 'package:skywa/components/businessWidget.dart';
+import 'package:skywa/screens/current_sreen.dart';
 
-class CustomDialog extends StatefulWidget {
-  final Function() goToCurrentScreen;
-  final companyName;
-  const CustomDialog({Key key , this.goToCurrentScreen , @required this.companyName}) : super(key: key);
+class CustomCalledInDialog extends StatefulWidget {
+  const CustomCalledInDialog({Key key}) : super(key: key);
 
   @override
-  _CustomDialogState createState() => _CustomDialogState();
+  _CustomCalledInDialogState createState() => _CustomCalledInDialogState();
 }
 
-class _CustomDialogState extends State<CustomDialog> {
+class _CustomCalledInDialogState extends State<CustomCalledInDialog> {
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       actions: [
-        ElevatedButton(onPressed: (){
-          if(widget.goToCurrentScreen != null)
-            widget.goToCurrentScreen();
-          Navigator.pop(context);}, child: Text('Done'))
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('Okay'),
+        )
       ],
       content: Container(
         width: double.infinity,
@@ -43,18 +51,10 @@ class _CustomDialogState extends State<CustomDialog> {
                 height: 80.0,
                 decoration: new BoxDecoration(
                   shape: BoxShape.circle,
-                  color: [
-                    Color(0xFF4C44B3),
-                    Color(0xFF3CD1BB),
-                  ][DB.box.get(DB.index) % 2],
+                  color: Theme.of(context).primaryColor,
                 ),
                 child: Center(
-                  child: Text(
-                    getInitials(widget.companyName),
-                    textAlign: TextAlign.center,
-                    style:
-                        GoogleFonts.poppins(color: Colors.white, fontSize: 18),
-                  ),
+                  child: Icon(Icons.meeting_room , size: 40.0, color: Colors.white,),
                 ),
               ),
             ),
@@ -62,12 +62,12 @@ class _CustomDialogState extends State<CustomDialog> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: 50.0,
+                  height: 30.0,
                 ),
                 Center(
                   child: Text(
-                    widget.companyName,
-                    style: TextStyle(
+                    'Called In',
+                    style: GoogleFonts.poppins(
                         fontSize: 20.0,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
@@ -77,20 +77,10 @@ class _CustomDialogState extends State<CustomDialog> {
                   height: 20.0,
                 ),
                 Text(
-                  'Your appointment is confirmed. Kindly be on time and wait for your turn to be called.  ',
+                  'We are ready for you please walk to the entrance.',
                   style: TextStyle(
                     fontSize: 15.0,
-                    color: Colors.grey[800],
-                  ),
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                Text(
-                  'For any queries, you reach out to us via chat or call.',
-                  style: TextStyle(
-                    fontSize: 15.0,
-                    color: Colors.grey[800],
+                    color: Colors.black87,
                   ),
                 ),
                 SizedBox(

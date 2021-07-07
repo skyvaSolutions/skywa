@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/appointmentScreenProvider.dart';
+import 'package:skywa/Providers/appointment_tap_provider.dart';
+import 'package:skywa/components/fetching_image_widget.dart';
+import 'package:skywa/components/no_appointments_widget.dart';
 import 'package:skywa/components/upcomingScreen.dart';
 
 class Appointment extends StatefulWidget {
-  const Appointment({Key key}) : super(key: key);
+  final Function() goToCurrentScreen;
+  const Appointment({Key key, this.goToCurrentScreen}) : super(key: key);
 
   @override
   _AppointmentState createState() => _AppointmentState();
@@ -13,15 +17,18 @@ class Appointment extends StatefulWidget {
 class _AppointmentState extends State<Appointment> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+  }
+
+  refresh() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final pa = Provider.of<appointmentScreenProvider>(context, listen: false);
     return DefaultTabController(
-      initialIndex: 1,
+      initialIndex: context.read<AppointmentTabIndex>().tab,
       length: 3,
       child: Scaffold(
         appBar: PreferredSize(
@@ -32,13 +39,13 @@ class _AppointmentState extends State<Appointment> {
             unselectedLabelColor: Theme.of(context).primaryColor,
             tabs: <Widget>[
               Tab(
-                text: "Upcoming",
-              ),
-              Tab(
                 text: "Past",
               ),
               Tab(
                 text: "Active",
+              ),
+              Tab(
+                text: "Upcoming",
               ),
             ],
           ),
@@ -50,33 +57,57 @@ class _AppointmentState extends State<Appointment> {
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return Text(
-                    'Fetching data',
-                    textAlign: TextAlign.center,
+                  return FetchingScreen(
+                    imagePath: 'assets/images/fetching.png',
+                    displayText: 'Fetching your appointments',
                   );
                 case ConnectionState.active:
                   return Text('');
                 case ConnectionState.waiting:
-                  return Text("Fetching Data...");
+                  return FetchingScreen(
+                    imagePath: 'assets/images/fetching.png',
+                    displayText: 'Fetching your appointments',
+                  );
                 case ConnectionState.done:
+                  print(pa.activeRes.length);
                   return TabBarView(
                     children: <Widget>[
-                      Upcoming(
-                        list: pa.upcomingRes,
-                      ),
-                      Upcoming(
-                        list: pa.pastRes,
-                      ),
-                      Upcoming(
-                        list: pa.activeRes,
-                      ),
+                      pa.pastRes.length == 0
+                          ? NoAppointments(
+                              imagePath: 'assets/images/no_appointments.png',
+                              text: 'No past appointments',
+                            )
+                          : Upcoming(
+                              tab: 0,
+                              list: pa.pastRes,
+                              refreshParent: refresh,
+                            ),
+                      pa.activeRes.length == 0
+                          ? NoAppointments(
+                              imagePath: 'assets/images/no_appointments.png',
+                              text: 'No Active appointments',
+                            )
+                          : Upcoming(
+                              tab: 1,
+                              list: pa.activeRes,
+                              goToCurrentScreen: widget.goToCurrentScreen,
+                            ),
+                      pa.upcomingRes.length == 0
+                          ? NoAppointments(
+                              imagePath: 'assets/images/no_appointments.png',
+                              text: 'No upcoming appointments',
+                            )
+                          : Upcoming(
+                              tab: 2,
+                              list: pa.upcomingRes,
+                              refreshParent: refresh,
+                            ),
                     ],
                   );
               }
-              return Text("Fetching Chucky Categories...");
+              return Container();
             }),
       ),
     );
-    ;
   }
 }

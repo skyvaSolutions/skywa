@@ -1,3 +1,4 @@
+
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -5,8 +6,12 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:skywa/Providers/ThemeProvider.dart';
 import 'package:skywa/Providers/appointmentScreenProvider.dart';
+import 'package:skywa/Providers/appointment_tap_provider.dart';
 import 'package:skywa/Providers/createReservationProvider.dart';
+import 'package:skywa/Providers/loading_provider.dart';
 import 'package:skywa/Providers/searchProvider.dart';
+import 'package:skywa/components/AppointmentsWidget.dart';
+import 'package:skywa/components/business_card.dart';
 import 'package:skywa/screens/helpScreen.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
@@ -17,6 +22,7 @@ import 'package:skywa/screens/splashScreen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'DB/DB.dart';
+import 'Providers/member_state_changed.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -30,11 +36,14 @@ void main() async {
     ChangeNotifierProvider(create: (context) => appointmentScreenProvider()),
     ChangeNotifierProvider(create: (context) => searchProvider()),
     ChangeNotifierProvider(create: (context) => createReservationProvider()),
+    ChangeNotifierProvider<MemberStateChanged>(create: (context) => MemberStateChanged()),
+    ChangeNotifierProvider<AppointmentTabIndex>(create: (context) => AppointmentTabIndex()),
+    ChangeNotifierProvider<LoadingScreen>(create: (context) => LoadingScreen()),
   ], child: MyApp()));
 }
 
 const FlexSchemeData customFlexScheme = FlexSchemeData(
-  name: 'Toledo purple',
+  name: 'Skywa Theme',
   description: 'Purple theme created from custom defined colors.',
   light: FlexSchemeColor(
     primary: Color(0xFF4C44B3),
@@ -76,6 +85,7 @@ class MyApp extends StatelessWidget {
           SettingScreen.id: (context) => SettingScreen(),
           ProfileEditPage.id: (context) => ProfileEditPage(),
           SearchPage.id: (context) => SearchPage(),
+
         },
       ),
     );

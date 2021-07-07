@@ -1,33 +1,21 @@
-import 'dart:async';
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
-import 'package:skywa/DB/DB.dart';
-import 'package:skywa/Global&Constants/DeviceDetailsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
-import 'package:skywa/api_calls/get_my_reservations.dart';
 import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
-import 'package:skywa/screens/appointment_status.dart';
+import 'package:skywa/screens/contact_us_screen.dart';
 import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/screens/Appointment.dart';
-import 'package:skywa/screens/CurrentBookings.dart';
 import 'package:skywa/screens/helpScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/screens/profileEditScreen.dart';
 import 'package:skywa/screens/searchPage.dart';
 import 'package:skywa/screens/settingScreen.dart';
-import 'package:skywa/screens/splashScreen.dart';
 import 'package:skywa/services/deviceConnection.dart';
 import 'package:skywa/utils/Network_aware.dart';
-import 'package:http/http.dart' as http;
-import 'package:skywa/api_calls/find_users.dart';
+
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'homeScreen';
@@ -36,16 +24,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _pageOptions = [HomeBar(), CurrentScreen(), HomeBar()];
-  StreamSubscription _connectionChangeStream;
+ // StreamSubscription _connectionChangeStream;
   @override
   void initState() {
     super.initState();
   }
 
-  goToCurrentScreen() {
+  goToAppointmentScreen() {
     setState(() {
       _selected = 1;
+    });
+  }
+
+  goToCurrentScreen(){
+    setState(() {
+      _selected = 2;
     });
   }
 
@@ -61,24 +54,35 @@ class _HomeScreenState extends State<HomeScreen> {
     'Carline'
   ];
   int _selected = 0;
+  String appBarText = "";
   final List<int> msgCount = <int>[2, 0, 10, 6, 52, 4, 0, 2];
   List<Widget> body = [];
   Widget build(BuildContext context) {
     body = [
-      HomeBar(goToCurrentScreen: goToCurrentScreen),
-      CurrentScreen(),
-      Appointment()
+      HomeBar(goToAppointmentScreen: goToAppointmentScreen , goToCurrentScreen : goToCurrentScreen),
+      Appointment(goToCurrentScreen : goToCurrentScreen),
+      CurrentScreen(goToAppointmentScreen: goToAppointmentScreen,),
     ];
+    if(_selected == 0){
+      appBarText = "Home";
+    }
+    else if(_selected == 1){
+      appBarText = "Appointments";
+    }
+    else{
+      appBarText = "Current Appointment";
+    }
     return Scaffold(
         // extendBodyBehindAppBar: true,
         appBar: AppBar(
           centerTitle: true,
-          title: Text(
-            "Welcome",
+          title:
+          Text(
+            appBarText,
             style: GoogleFonts.poppins(),
           ),
           actions: [
-            if (_selected != 1)
+            if (_selected == 0)
               IconButton(
                   onPressed: () {
                     Navigator.pushNamed(context, SearchPage.id);
@@ -93,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         drawer: AppDrawer(),
         bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor: Theme.of(context).primaryColor,
           onTap: (e) {
             setState(() {
               _selected = e;
@@ -108,12 +113,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.list_alt),
-              label: 'Current Bookings',
+              label: 'Appointments',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'Appointments',
-            )
+              icon: Icon(Icons.today),
+              label: 'Current Appt.',
+            ),
           ],
         ),
         body: StreamProvider<NetworkStatus>(
@@ -141,8 +146,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeBar extends StatefulWidget {
+  final Function() goToAppointmentScreen;
   final Function() goToCurrentScreen;
-  const HomeBar({Key key, @required this.goToCurrentScreen}) : super(key: key);
+  const HomeBar({Key key, @required this.goToAppointmentScreen , this.goToCurrentScreen}) : super(key: key);
 
   @override
   _HomeBarState createState() => _HomeBarState();
@@ -164,8 +170,11 @@ class _HomeBarState extends State<HomeBar> {
               child: BusinessWidget(
                 name: nearbyQs[index].companyName,
                 address: nearbyQs[index].address,
+                openTime : nearbyQs[index].openTime,
+                closeTime : nearbyQs[index].closeTime,
                 index: index,
-                goToCurrentScreen: widget.goToCurrentScreen,
+                goToAppointmentScreen: widget.goToAppointmentScreen,
+                goToCurrentScreen : widget.goToCurrentScreen,
               ),
             );
           }),
@@ -224,55 +233,64 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          createHeader(),
-          createDrawerItem(
-            icon: Icons.account_box,
-            text: 'Update Profile',
-            onTap: () => Navigator.pushNamed(context, ProfileEditPage.id),
-          ),
-          createDrawerItem(
-            icon: Icons.help,
-            text: 'Help',
-            onTap: () => Navigator.pushNamed(context, HelpScreen.id),
-          ),
-          createDrawerItem(
-            icon: Icons.category,
-            text: 'Introduction',
-            onTap: () => Navigator.pushNamed(context, OnBoardingPage.id),
-          ),
-          createDrawerItem(
-            icon: Icons.settings,
-            text: 'Settings',
-            onTap: () => Navigator.pushNamed(context, SettingScreen.id),
-          ),
-          /*
-         onTap: () =>
+      child: Container(
+        color: Color(0xFF4C44B3),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            createHeader(),
+            Divider(
+              height: 2.0,
+              color: Colors.white,
+            ),
+            createDrawerItem(
+              icon: Icons.account_circle,
+              text: 'Update Profile',
+              onTap: () => Navigator.pushNamed(context, ProfileEditPage.id),
+            ),
+            // createDrawerItem(
+            //   icon: Icons.settings,
+            //   text: 'Settings',
+            //   onTap: () => Navigator.pushNamed(context, SettingScreen.id),
+            // ),
+            createDrawerItem(
+              icon: Icons.help,
+              text: 'Help',
+              onTap: () => Navigator.pushNamed(context, HelpScreen.id),
+            ),
+            createDrawerItem(
+              icon: Icons.category,
+              text: 'Getting Started',
+              onTap: () => Navigator.pushNamed(context, OnBoardingPage.id),
+            ),
+            /*
+           onTap: () =>
 
-          */
-          Divider(),
-          createDrawerItem(
-            icon: Icons.share,
-            text: 'Tell a Friend',
-            onTap: () => {
-              // if (userDevice.isIOS)
-              //   {
-              //     Share.share('Download our cool new App' + appName,
-              //         subject: 'Check Out ' + appName + '\n  ' + appleStoreURL)
-              //   }
-              // else
-              //   {
-              //     Share.share('Download our cool new App' + appName,
-              //         subject:
-              //             'Check Out ' + appName + '\n  ' + androidStoreURL)
-              //   }
-            },
-          ),
-          createDrawerItem(
-              icon: Icons.email, text: 'Contact Us', onTap: () => sendemail()),
-        ],
+            */
+
+            createDrawerItem(
+              icon: Icons.people,
+              text: 'Invite a Friend',
+              onTap: () => {
+                // if (userDevice.isIOS)
+                //   {
+                //     Share.share('Download our cool new App' + appName,
+                //         subject: 'Check Out ' + appName + '\n  ' + appleStoreURL)
+                //   }
+                // else
+                //   {
+                //     Share.share('Download our cool new App' + appName,
+                //         subject:
+                //             'Check Out ' + appName + '\n  ' + androidStoreURL)
+                //   }
+              },
+            ),
+            createDrawerItem(
+                icon: Icons.email, text: 'Contact Us', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>ContactUs()))
+                //sendemail()
+            ),
+          ],
+        ),
       ),
     );
   }

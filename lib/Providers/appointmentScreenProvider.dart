@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
-import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/model/reservation.dart';
+import 'package:skywa/screens/profileEditScreen.dart';
 
 class appointmentScreenProvider with ChangeNotifier {
   List<Reservation> _upcomingReservation = [];
@@ -28,27 +27,15 @@ class appointmentScreenProvider with ChangeNotifier {
     print(data.data);
     List d = data.data;
     for (int i = 0; i < d.length; i++) {
-      if (d[i]["MemberState"] != null || d[i]["MemberState"] != "notSet") {
-        //var parsedDate = DateTime.parse(d[i]["ReservationStartTime"]);
-        //print(parsedDate);
+      if (d[i]["MemberState"] != null || d[i]["MemberState"] != "notSet" && d[i]["ReservationStartTime"] != null && d[i]["ReservationStartTime"] != "notSet") {
+        String memberState = d[i]["MemberState"];
+        DateTime reservationStartTime = convertDateFromString(d[i]["ReservationStartTime"]);
+        print(reservationStartTime);
+        DateTime today = DateTime.now();
         print("started");
-        // print(DateTime.now().toUtc().toString() +
-        //     " minus " +
-        //     parsedDate.toString() +
-        //     " " +
-        //     parsedDate.difference(DateTime.now()).inHours.toString());
-        // if (parsedDate.difference(DateTime.now()).inHours <= 5 &&
-        //     parsedDate.difference(DateTime.now()).inHours >= 0) {
-        //   print("yes");
-        //   _activeReservation.add(Reservation.fromJson(d[i]));
-        // } else if (parsedDate.difference(DateTime.now()).inHours < 0) {
-        //   _pastReservation.add(Reservation.fromJson(d[i]));
-        // } else {
-        //   _upcomingReservation.add(Reservation.fromJson(d[i]));
-        // }
-        if (d[i]["MemberState"] == "Completed")
+        if (memberState == "Completed" || (reservationStartTime.day < today.day || reservationStartTime.month < today.month || reservationStartTime.year < today.year))
           _pastReservation.add(Reservation.fromJson(d[i]));
-        else if (d[i]["MemberState"] == "Not Arrived")
+        else if ((reservationStartTime.day > today.day || reservationStartTime.month > today.month || reservationStartTime.year > today.year))
           _upcomingReservation.add(Reservation.fromJson(d[i]));
         else
           _activeReservation.add(Reservation.fromJson(d[i]));

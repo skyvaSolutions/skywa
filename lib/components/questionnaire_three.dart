@@ -41,7 +41,7 @@ class _QuestionnaireThreeState extends State<QuestionnaireThree> {
             onPressed: () {
               goBack();
             },
-            child: Text('Submit'),
+            child: Text('Done'),
           ),
         ],
       ),

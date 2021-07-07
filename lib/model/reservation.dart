@@ -1,7 +1,7 @@
 import 'package:skywa/model/attendee.dart';
 
 class Reservation {
-  String DevideID;
+  String DeviceID;
   String QID;
   String QJoinTime;
   String OriginalIETA;
@@ -31,7 +31,7 @@ class Reservation {
   List<dynamic> AttendeeData;
 
   Reservation(
-      this.DevideID,
+      this.DeviceID,
       this.QID,
       this.QJoinTime,
       this.OriginalIETA,

@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:skywa/Providers/loading_provider.dart';
 import 'package:skywa/Providers/member_state_changed.dart';
 import 'package:skywa/api_calls/add_update_reservation.dart';
 import 'package:skywa/api_calls/delete_reservation.dart';
 import 'package:skywa/api_calls/get_single_reservation.dart';
 import 'package:skywa/api_calls/q_meta_data.dart';
 import 'package:skywa/api_responses/recent_reservation.dart';
+import 'package:skywa/components/show_called_in_dialog.dart';
 import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/services/locationServices.dart';
+import 'package:skywa/utils/open_google_map.dart';
 import 'package:timelines/timelines.dart';
 
 const kTileHeight = 50.0;
@@ -28,8 +33,8 @@ double longitude;
 
 bool stopDistanceTimer = false;
 bool stopArrivedTimer = false;
+int showDialogOnce = 0;
 
-bool isLoading = false;
 
 
 void callUpdateReservationApi(Map<String, dynamic> reservationValues) async {
@@ -54,7 +59,7 @@ Future<void> getLocation () async {
 
  Map<String, dynamic> resObject() {
   Map<String, dynamic> reservationValues = {};
-  reservationValues["DeviceID"] = currentReservation.currentRes.DevideID;
+  reservationValues["DeviceID"] = currentReservation.currentRes.DeviceID;
   reservationValues["QID"] = currentReservation.currentRes.QID;
   reservationValues["MemberState"] = "Arrived";
   reservationValues["ReservationID"] =
@@ -101,10 +106,16 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
     if(currentReservation.currentRes.MemberState == "Arrived" || currentReservation.currentRes.MemberState == "Called to Enter" || currentReservation.currentRes.MemberState == "In Facility" ){
       await getSingleReservation.getCurrentReservation();
       if(currentReservation.currentRes.MemberState == "Called to Enter"){
+        showDialogOnce = showDialogOnce + 1;
         Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(2);
         setState(() {
 
         });
+        if(showDialogOnce == 1){
+          showDialog(context: context, builder: (BuildContext){
+            return CustomCalledInDialog();
+          });
+        }
       }
       if(currentReservation.currentRes.MemberState == "In Facility"){
         Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(3);
@@ -166,6 +177,8 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<MemberStateChanged>(context , listen: false).initializeProvider();
+    Provider.of<LoadingScreen>(context , listen: false).initializeUpdateProvider();
     return Center(
       child: Column(
         children: [
@@ -202,6 +215,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
                 itemExtentBuilder: (_, __) =>
                     MediaQuery.of(context).size.width / _processes.length,
                 oppositeContentsBuilder: (context, index) {
+                  print(Provider.of<MemberStateChanged>(context).statusIndex);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10.0),
                     child: Icon(
@@ -347,9 +361,9 @@ class _StatusMessageState extends State<StatusMessage> {
           if (context.read<MemberStateChanged>().statusIndex == 0)
             Column(
               children: [
-                if(isLoading)
+                if(context.read<LoadingScreen>().updateReservationLoading)
                   CircularProgressIndicator(color: Theme.of(context).primaryColor,backgroundColor: Colors.white,),
-                if(!isLoading)
+                if(!context.read<LoadingScreen>().updateReservationLoading)
                   ListTile(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0),
@@ -365,19 +379,20 @@ class _StatusMessageState extends State<StatusMessage> {
                      trailing : ElevatedButton(
                         onPressed: ()
                         async {
-                          print(currentReservation.currentRes.DevideID);
+                          print(currentReservation.currentRes.DeviceID);
                           Map<String, dynamic> reservationValues = resObject();
                           setState(() {
-                            isLoading = true;
+                            Provider.of<LoadingScreen>(context , listen: false).changeUpdateReservationLoading();
                           });
                           await addUpdateReservation.addUpdateRes(reservationValues);
                           await getSingleReservation.getCurrentReservation();
                           setState(() {
-                            isLoading = false;
+                            Provider.of<LoadingScreen>(context , listen: false).changeUpdateReservationLoading();
                           });
                           if (currentReservation.currentRes.MemberState == "Arrived"){
                             Provider.of<MemberStateChanged>(context, listen: false).changeStatusIndex(1);
                           }
+                          Provider.of<LoadingScreen>(context , listen: false).changeUpdateReservationLoading();
                           widget.updateParent();
                         },
                         child: Text(
@@ -395,7 +410,7 @@ class _StatusMessageState extends State<StatusMessage> {
               tileColor: todoColor,
               contentPadding: EdgeInsets.all(20.0),
               subtitle: Text(
-                'Your appointment is completed. Update your current reservation',
+                'Your appointment is completed. Fetch your next reservation',
                 style: TextStyle(
                   fontSize: 15.0,
                 ),
@@ -403,8 +418,9 @@ class _StatusMessageState extends State<StatusMessage> {
               trailing : ElevatedButton(
                 onPressed: ()
                 async {
-                  todayRes = [];
+                  getAndSortReservations();
                   widget.notifyGrandParent();
+
                 },
                 child: Text(
                   'Update',
@@ -422,8 +438,8 @@ class _StatusMessageState extends State<StatusMessage> {
 
 
 class ButtonRow extends StatefulWidget {
-  final Function() notifyParent;
-  const ButtonRow({Key key , @required this.notifyParent}) : super(key: key);
+  final Function() goToAppointmentScreen;
+  const ButtonRow({Key key , this.goToAppointmentScreen}) : super(key: key);
 
   @override
   _ButtonRowState createState() => _ButtonRowState();
@@ -501,10 +517,10 @@ class _ButtonRowState extends State<ButtonRow> {
                         ElevatedButton(
                           onPressed: () async {
                             await deleteReservation.deleteRes();
-                            todayRes = [];
                             stopArrivedTimer = true;
                             stopDistanceTimer = true;
-                            widget.notifyParent();
+                            currentReservation.CurrentReservationId = null;
+                            widget.goToAppointmentScreen();
                             Navigator.pop(context);
                           },
                           child: Text(
@@ -524,7 +540,7 @@ class _ButtonRowState extends State<ButtonRow> {
               );
             },
             child: Text(
-              'Cancel',
+              'Delete',
             ),
             style: ButtonStyle(
                 backgroundColor:
@@ -579,7 +595,9 @@ void _modalBottomSheetMenu(BuildContext context) {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      onTap: (){},
+                      onTap: (){
+                        //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=> OpenGMap()));
+                      },
                     ),
                     SizedBox(
                       height: 10.0,

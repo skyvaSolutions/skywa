@@ -71,36 +71,22 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 //      ),
       pages: [
         PageViewModel(
-          title: "Intro Screen1",
-          body: "A little bit about my App.",
-          image: _buildImage('OnBoard.png'),
+          title: "Easy Check in",
+          body: "Skywa allows you to check into a business remotely. When you arrive at the business simply click check in. The business will be notified that you have arrived. ",
+          image: _buildImage('progress.png'),
           decoration: pageDecoration,
         ),
         PageViewModel(
-          title: "Intro Screen 2",
-          body: "A little more about my App",
-          image: _buildImage('OnBoard.png'),
+          title: "Hassle-Free waiting",
+          body: "Wait comfortably nearby and you will receive a notification when it is your turn to enter.",
+          image: _buildImage('sitting.png'),
           decoration: pageDecoration,
-          footer: ElevatedButton(
-            onPressed: () {
-              // On button presed
-            },
-            child: const Text("More Information"),
-          ),
         ),
 
         PageViewModel(
-          title: "Intro Screen3",
-          bodyWidget: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text("Creating a more complicated "),
-              Icon(Icons.edit),
-              Text(" Intro Message"),
-            ],
-          ),
-          //    body: "A little more more about my app",
-          image: _buildImage('OnBoard.png'),
+          title: "Say No to Long Queues",
+          body: "No more standing in lines or sitting in uncomfortable waiting rooms",
+          image: _buildImage('queue.png'),
           decoration: pageDecoration,
         ),
 //
@@ -124,13 +110,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         size: Size(10.0, 10.0),
         color: Color(0xFFBDBDBD),
         activeSize: Size(22.0, 10.0),
-        activeColor: Color(0xFFFFD344),
+        activeColor: Color(0xFFEDAF11),
         activeShape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(25.0)),
         ),
       ),
       dotsContainerDecorator: const ShapeDecoration(
-        color: Colors.black87,
+        color: Color(0xFF4C44B3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(8.0)),
         ),

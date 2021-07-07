@@ -14,6 +14,7 @@ import 'package:skywa/api_calls/find_users.dart';
 import 'package:skywa/model/person.dart';
 import 'package:uuid/uuid.dart';
 import 'package:date_format/date_format.dart';
+import 'package:form_builder_file_picker/form_builder_file_picker.dart';
 
 var uuid = Uuid();
 String fullName = "", email = "", address = "", gender = "";
@@ -63,6 +64,8 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       TextEditingController(text: getPerson.fetchedVal['email']);
   final addressHolder =
       TextEditingController(text: getPerson.fetchedVal['address']);
+  final phoneNumberHolder =
+  TextEditingController(text: getPerson.fetchedVal['phoneNumber']);
 
   File _image;
   final picker = ImagePicker();
@@ -84,10 +87,10 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          Icon(
-            Icons.more_vert_outlined,
-            size: 25,
-          )
+          // Icon(
+          //   Icons.more_vert_outlined,
+          //   size: 25,
+          // )
         ],
         elevation: 1,
         centerTitle: true,
@@ -218,61 +221,112 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 validator: FormBuilderValidators.compose(
                     [FormBuilderValidators.max(context, 70), (val) {}]),
               ),
-              SizedBox(
-                height: 12,
-              ),
-              ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.only(
-                        top: 15, left: 20, right: 20, bottom: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                  ),
+
+              TextButton(
                   onPressed: () {
                     getLocation();
                   },
-                  child: Text(
-                    "Get Location",
-                    style: GoogleFonts.lato(fontSize: 14),
+                  child: Row(
+                    children: [
+                      Icon(Icons.location_on),
+                      SizedBox(
+                        width: 10.0,
+                      ),
+                      Text(
+                        "Locate Me",
+                        style: GoogleFonts.lato(fontSize: 17 , fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   )),
+              // FormBuilderFilePicker(
+              //   name: "insurance card",
+              //   decoration: InputDecoration(border: InputBorder.none ),
+              //   maxFiles: null,
+              //   previewImages: true,
+              //   onChanged: (val) => print(val),
+              //   selector: Column(
+              //     children: [
+              //       SizedBox(
+              //         height: 10.0,
+              //       ),
+              //       Row(
+              //         children: <Widget>[
+              //           Icon(Icons.attach_file , color:  Theme.of(context).primaryColor,),
+              //           Text('Upload Identity/Insurance Card' , style: GoogleFonts.lato(fontSize: 17 ),),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              //   onFileLoading: (val) {
+              //     print(val);
+              //   },
+              // ),
               SizedBox(
-                height: 12,
+                height: 12.0,
+              ),
+              FormBuilderTextField(
+                style: GoogleFonts.lato(fontSize: 19),
+                name: 'Phone Number',
+                controller: phoneNumberHolder,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                validator: FormBuilderValidators.compose(
+                  [
+                    FormBuilderValidators.minLength(context, 10,
+                        errorText: 'Enter a valid Phone Number'),
+                    FormBuilderValidators.maxLength(context, 10,
+                        errorText: 'Enter a valid Phone Number'),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 12.0,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.only(
-                              top: 10, left: 25, right: 25, bottom: 10),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10))),
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)
+                          ))),
                       onPressed: () {
                         onSavePressed(_formKey, context);
                       },
-                      child: Text(
-                        "Save",
-                        style: GoogleFonts.lato(fontSize: 18),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Text(
+                          "Save",
+                          style: GoogleFonts.lato(fontSize: 18),
+                        ),
                       )),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.only(
-                            top: 10, left: 25, right: 25, bottom: 10),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
+                  TextButton(
+                      style: ButtonStyle(
+                        side: MaterialStateProperty.all(BorderSide(
+                          color: Theme.of(context).primaryColor
+                        )),
+                        backgroundColor: MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)
+                        ))),
                       onPressed: () {
                         _formKey.currentState.reset();
                         nameHolder.clear();
                         emailHolder.clear();
                         addressHolder.clear();
                       },
-                      child: Text(
-                        "Clear",
-                        style: GoogleFonts.lato(fontSize: 18),
-                      ))
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric( horizontal: 10.0),
+                        child: Text(
+                          "Clear",
+                          style: GoogleFonts.lato(fontSize: 18 , color: Theme.of(context).primaryColor),
+                        ),
+                      )),
                 ],
-              )
+              ),
             ],
           ),
         ),

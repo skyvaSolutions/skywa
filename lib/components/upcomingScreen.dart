@@ -7,8 +7,11 @@ import 'package:skywa/components/AppointmentsWidget.dart';
 import 'package:skywa/model/reservation.dart';
 
 class Upcoming extends StatefulWidget {
+  final int tab;
   final List<Reservation> list;
-  const Upcoming({Key key, this.list}) : super(key: key);
+  final Function() goToCurrentScreen;
+  final Function() refreshParent;
+  const Upcoming({Key key, this.list , @required this.tab , this.goToCurrentScreen , this.refreshParent}) : super(key: key);
 
   @override
   _UpcomingState createState() => _UpcomingState();
@@ -31,8 +34,12 @@ class _UpcomingState extends State<Upcoming> {
             return Padding(
               padding: const EdgeInsets.only(left: 13, right: 13, top: 8.0),
               child: AppointmentTab(
+                id: widget.list[index].ReservationID,
                 name: widget.list[index].CompanyName,
                 address: widget.list[index].Address,
+                tab : widget.tab,
+                goToCurrentScreen : widget.goToCurrentScreen,
+                refreshParent : widget.refreshParent,
               ),
             );
           }),

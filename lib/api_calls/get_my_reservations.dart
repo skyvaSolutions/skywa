@@ -24,9 +24,11 @@ class GetMyReservations{
       print(myResList.length);
       if(myResList.length == 0){
         myReservations.noReservations = true;
+        myReservations.reservationsLength = 0;
       }
       else{
         myReservations.noReservations = false;
+        myReservations.reservationsLength = myResList.length;
         myResList.forEach((element) =>
           myReservations.reservationsList.add(Reservation.fromJson(element))
         );

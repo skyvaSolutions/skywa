@@ -4,17 +4,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skywa/DB/DB.dart';
+import 'package:skywa/components/business_card.dart';
 import 'package:skywa/utils/showDialogforName.dart';
 
 class BusinessWidget extends StatefulWidget {
-  final name, address, index;
-  final Function goToCurrentScreen;
+  final name, address, index , openTime, closeTime;
+  final Function() goToAppointmentScreen;
+  final Function() goToCurrentScreen;
   const BusinessWidget(
       {Key key,
-      this.name,
-      this.address,
-      this.index,
-      @required this.goToCurrentScreen})
+        this.name,
+        this.address,
+        this.index,
+        this.openTime,
+        this.closeTime,
+        this.goToAppointmentScreen,
+        this.goToCurrentScreen})
       : super(key: key);
   @override
   _BusinessWidgetState createState() => _BusinessWidgetState();
@@ -42,133 +47,132 @@ class _BusinessWidgetState extends State<BusinessWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.36,
-      width: MediaQuery.of(context).size.width * 0.9,
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        elevation: 20,
-        child: ClipPath(
-          clipper: ShapeBorderClipper(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20))),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height * 0.23,
-                child: Stack(
+        child: InkWell(
+          splashColor: Theme.of(context).primaryColor.withAlpha(40),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => BusinessDetail(
+              contextParent : context,
+              companyName: widget.name,
+              address: widget.address,
+              index: widget.index,
+              openTime: widget.openTime,
+              closeTime: widget.closeTime,
+              goToAppointmentScreen: widget.goToAppointmentScreen,
+              goToCurrentScreen: widget.goToCurrentScreen,
+            )));
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0 , horizontal: 10.0),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    CachedNetworkImage(
-                      placeholder: (context, url) => Stack(
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 40),
-                            child: Image.asset(
-                              "assets/images/image-placeholder.png",
-                            ),
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.20,
-                            width: double.infinity,
-                            child: LinearProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation(
-                                Colors.grey.withOpacity(0.5),
-                              ),
-                              backgroundColor: Colors.transparent,
-                            ),
-                          ),
-                        ],
+                    CircleAvatar(
+                      radius: 35.0,
+                      backgroundColor: [
+                        Color(0xFF4C44B3),
+                        Color(0xFF3CD1BB),
+                      ][widget.index % 2],
+                      child: Center(
+                        child: Text(
+                          widget.name.toString().length == 0
+                              ? ""
+                              : getInitials(widget.name),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                              color: Colors.white, fontSize: 18),
+                        ),
                       ),
-                      errorWidget: (context, url, error) => SizedBox(
-                        child: Icon(Icons.warning),
-                        width: 90,
-                        height: 90,
-                      ),
-                      imageUrl: [
-                        "http://nebula.wsimg.com/f8718f1686ddf5364fb59d810396dfd8?AccessKeyId=7308F00505C458ECD224&disposition=0&alloworigin=1",
-                        "https://images1-fabric.practo.com/practices/1255057/dr-maneesha-singh-clinic-gynaecologist-ghaziabad-5cc44e9a814e8.jpg",
-                        "https://www.thedoctorsclinic.com/images/content/Cardiology%20Waiting%20Room.jpg"
-                      ][widget.index % 3],
-                      height: MediaQuery.of(context).size.height * 0.20,
-                      width: MediaQuery.of(context).size.width,
-                      fit: BoxFit.fill,
                     ),
-                    Positioned(
-                      top: MediaQuery.of(context).size.height * 0.11,
-                      left: 20,
-                      child: Container(
-                        height: MediaQuery.of(context).size.height * 0.11,
-                        width: MediaQuery.of(context).size.height * 0.11,
-                        decoration: BoxDecoration(
-                          color: [
-                            Color(0xFF4C44B3),
-                            Color(0xFF3CD1BB),
-                          ][widget.index % 2],
-                          borderRadius: BorderRadius.circular(100),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.name,
+                          style: GoogleFonts.poppins(
+                              fontSize: 17, fontWeight: FontWeight.w600),
                         ),
-                        child: Center(
+                        Container(
+                          width: MediaQuery.of(context).size.width*0.6,
                           child: Text(
-                            widget.name.toString().length == 0
-                                ? ""
-                                : getInitials(widget.name),
-                            textAlign: TextAlign.center,
+                            widget.address.toString().trim(),
+                            textAlign: TextAlign.left,
+                            softWrap: true,
                             style: GoogleFonts.poppins(
-                                color: Colors.white, fontSize: 18),
+                                fontSize: 15.2, fontWeight: FontWeight.w300),
                           ),
                         ),
-                      ),
+                      ],
                     )
                   ],
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      widget.name,
-                      style: GoogleFonts.poppins(
-                          fontSize: 17, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: Text(
-                        widget.address.toString().trim(),
-                        textAlign: TextAlign.left,
-                        style: GoogleFonts.poppins(
-                            fontSize: 15.2, fontWeight: FontWeight.w300),
+                    MaterialButton(
+                      // shape: RoundedRectangleBorder(
+                      //     side:
+                      //     BorderSide(color: Theme.of(context).primaryColor),
+                      //     borderRadius: BorderRadius.circular(10)),
+                      onPressed:(){
+                        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => BusinessDetail(
+                          contextParent : context,
+                          companyName: widget.name,
+                          address: widget.address,
+                          index: widget.index,
+                          openTime: widget.openTime,
+                          closeTime: widget.closeTime,
+                          goToAppointmentScreen: widget.goToAppointmentScreen,
+                          goToCurrentScreen: widget.goToCurrentScreen,
+                        )));
+                      },
+                      child: Text("More" ,
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                      ),
                       ),
                     ),
                     MaterialButton(
                       shape: RoundedRectangleBorder(
                           side:
                               BorderSide(color: Theme.of(context).primaryColor),
-                          borderRadius: BorderRadius.circular(25)),
+                          borderRadius: BorderRadius.circular(10)),
                       onPressed: () async {
                         DB.box.put(DB.index, widget.index);
-                        await showMyDialog(context, widget.name.toString(),
-                            widget.index, widget.goToCurrentScreen);
+
+                        await showMyDialog(
+                            context,
+                            widget.name.toString(),
+                            widget.index,
+                            widget.goToAppointmentScreen,
+                            widget.goToCurrentScreen,
+                            false,
+                        );
                       },
-                      child: Text("Check In"),
-                    )
+                      child: Text("Add"),
+                    ),
                   ],
-                ),
-              ),
-            ],
+                )
+              ],
+            ),
           ),
         ),
+        shadowColor: Colors.black.withAlpha(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      decoration: new BoxDecoration(
+        boxShadow: [
+          new BoxShadow(
+              color: Colors.black.withAlpha(40),
+              blurRadius: 10.0,
+              offset: Offset(2, 4)),
+        ],
       ),
     );
   }

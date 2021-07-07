@@ -1,11 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skywa/api_calls/get_single_reservation.dart';
+import 'package:skywa/api_responses/recent_reservation.dart';
+import 'package:skywa/components/show_more_info_dialog.dart';
+import 'package:skywa/screens/past_appointment_screen.dart';
+import 'package:skywa/screens/upcoming_appointment_screen.dart';
 
 class AppointmentTab extends StatefulWidget {
-  final name, address;
+  final id , name, address , tab ;
+  final Function() goToCurrentScreen;
+  final Function() refreshParent;
 
-  AppointmentTab({Key key, this.name, this.address}) : super(key: key);
+  AppointmentTab({Key key, this.id ,this.name, this.address , this.tab , this.goToCurrentScreen , this.refreshParent}) : super(key: key);
 
   @override
   _AppointmentTabState createState() => _AppointmentTabState();
@@ -43,8 +49,40 @@ class _AppointmentTabState extends State<AppointmentTab> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5)),
                   ),
-                  onPressed: () async {},
-                  child: Text("Message"),
+                  onPressed: () async {
+                    if(widget.tab == 0){
+                     Map<String , String> particularReservationValues =  await getSingleReservation.getParticularReservation(widget.id);
+                     print(particularReservationValues);
+                     Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                         PastAppointment(
+                           id : widget.id,
+                           companyName: particularReservationValues['Company name'],
+                           reservationDateTime: particularReservationValues['Reservation DateTime'],
+                           reservationStatus: particularReservationValues['Status'],
+                           refreshParent : widget.refreshParent,
+                         )));
+                    }
+                    else if(widget.tab == 1){
+                      if(widget.goToCurrentScreen != null){
+                        currentReservation.CurrentReservationId = widget.id;
+                        widget.goToCurrentScreen();
+                      }
+                    }
+                    else if(widget.tab ==2 ){
+                      Map<String , String> particularReservationValues =  await getSingleReservation.getParticularReservation(widget.id);
+                      print(particularReservationValues);
+                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                          UpcomingAppointment(
+                            id : widget.id,
+                            companyName: particularReservationValues['Company name'],
+                            reservationDateTime: particularReservationValues['Reservation DateTime'],
+                            reservationStatus: particularReservationValues['Status'],
+                            refreshParent : widget.refreshParent,
+                          )));
+
+                    }
+                  },
+                  child: widget.tab != 1 ? Text("Show") : Text("Join"),
                 )),
           ),
         ),

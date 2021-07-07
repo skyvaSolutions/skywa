@@ -4,5 +4,6 @@ MyReservations myReservations = new MyReservations();
 
 class MyReservations{
   List<Reservation> reservationsList = [];
-  bool noReservations;
+  bool noReservations = true;
+  int reservationsLength = 0;
 }

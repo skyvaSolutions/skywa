@@ -13,6 +13,7 @@ import 'package:skywa/Providers/ThemeProvider.dart';
 import 'package:skywa/api_calls/find_users.dart';
 import 'package:skywa/api_responses/get_person.dart';
 import 'package:skywa/model/person.dart';
+import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/services/deviceInfoService.dart';
@@ -94,6 +95,8 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 /////////////////////////calling GetMyPeople API to check whether there is a registered customer or not with this device//////////////////////////////////////////////////////
     findUsers.returnPerson(context);
+    /////////////////////////////////////callinggetMyReservations to checj whether user has some reservations or not//////////////////
+    getAndSortReservations();
   }
 }
 

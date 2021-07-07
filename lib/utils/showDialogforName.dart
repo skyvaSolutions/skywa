@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:skywa/DB/DB.dart';
 import 'package:skywa/utils/showDialogforDate.dart';
 
-Future<void> showMyDialog(contextParent, name , index , goToCurrentScreen) async {
+Future<void> showMyDialog(contextParent, name , index , goToAppointmentScreen , goToCurrentScreen , returnBack) async {
   TextEditingController t1 = new TextEditingController();
   DB.box.get(DB.name) != null ? t1.text = DB.box.get(DB.name) : "";
   return showDialog<void>(
@@ -38,20 +38,20 @@ Future<void> showMyDialog(contextParent, name , index , goToCurrentScreen) async
         actions: <Widget>[
           TextButton(
             child:
-                Text('Cancel', style: GoogleFonts.poppins(color: Colors.red)),
+                Text('Cancel', style: GoogleFonts.poppins(color: Color(0xFFEDAF11))),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           TextButton(
             child: Text(
-              'Submit',
+              'Next',
               style: GoogleFonts.poppins(),
             ),
             onPressed: () {
               DB.box.put(DB.name, t1.text);
               Navigator.of(context).pop();
-              showDialogForDate(contextParent, name , index , goToCurrentScreen);
+              showDialogForDate(contextParent, name , index , goToAppointmentScreen , goToCurrentScreen , returnBack);
             },
           ),
         ],

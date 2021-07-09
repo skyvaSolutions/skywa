@@ -40,6 +40,7 @@ class _UpcomingState extends State<Upcoming> {
                 tab : widget.tab,
                 goToCurrentScreen : widget.goToCurrentScreen,
                 refreshParent : widget.refreshParent,
+                status : widget.list[index].MemberState,
               ),
             );
           }),

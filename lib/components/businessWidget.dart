@@ -153,7 +153,7 @@ class _BusinessWidgetState extends State<BusinessWidget> {
                             false,
                         );
                       },
-                      child: Text("Add"),
+                      child: Text("Check In"),
                     ),
                   ],
                 )

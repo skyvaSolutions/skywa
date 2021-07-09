@@ -90,6 +90,7 @@ class _CurrentScreenState extends State<CurrentScreen> {
                     ),
                     new AppointmentStatus(
                       notifyGrandParent: setUpApiCall,
+                      goToAppointmentScreen: widget.goToAppointmentScreen,
                     ),
                     Footer(),
                   ],

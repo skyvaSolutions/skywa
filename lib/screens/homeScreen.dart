@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
+import 'package:skywa/Global&Constants/DeviceDetailsConstants.dart';
 import 'package:skywa/Global&Constants/globalsAndConstants.dart';
 import 'package:skywa/components/businessWidget.dart';
 import 'package:skywa/components/tileWidgets.dart';
@@ -272,17 +274,17 @@ class AppDrawer extends StatelessWidget {
               icon: Icons.people,
               text: 'Invite a Friend',
               onTap: () => {
-                // if (userDevice.isIOS)
-                //   {
-                //     Share.share('Download our cool new App' + appName,
-                //         subject: 'Check Out ' + appName + '\n  ' + appleStoreURL)
-                //   }
-                // else
-                //   {
-                //     Share.share('Download our cool new App' + appName,
-                //         subject:
-                //             'Check Out ' + appName + '\n  ' + androidStoreURL)
-                //   }
+                if (userDevice.isIOS)
+                  {
+                    Share.share('Skywa allows you to check into a business remotely. ' + appName,
+                        subject: 'Check Out ' + appName + '\n  ' + "www.skywasolutions.com")
+                  }
+                else
+                  {
+                    Share.share('Skywa allows you to check into a business remotely.' + appName,
+                        subject:
+                            'Check Out ' + appName + '\n  ' + "www.skywasolutions.com")
+                  }
               },
             ),
             createDrawerItem(

@@ -19,7 +19,9 @@ class CustomDialog extends StatefulWidget {
   final String reservationTime ;
   final Function() goToCurrentScreen;
   final bool returnBack;
-  const CustomDialog({Key key , this.goToAppointmentScreen , @required this.companyName ,  this.reservationDate , this.reservationTime , this.goToCurrentScreen , this.returnBack}) : super(key: key);
+  final String reservationId;
+  final int tab;
+  const CustomDialog({Key key , this.goToAppointmentScreen , @required this.companyName ,  this.reservationDate , this.reservationTime , this.goToCurrentScreen , this.returnBack , this.reservationId , this.tab}) : super(key: key);
 
   @override
   _CustomDialogState createState() => _CustomDialogState();
@@ -33,19 +35,24 @@ class _CustomDialogState extends State<CustomDialog> {
       actions: [
         ElevatedButton(
             onPressed: () async{
-              // await getMyReservations.findReservations();
-              // if(myReservations.reservationsLength == 1){
-              //   //await getSingleReservation.getParticularReservation(myReservations.reservationsList[0].ReservationID);
-              //
-              //   if(widget.goToCurrentScreen != null)
-              //     widget.goToCurrentScreen();
-              // }
-              // else{
-              // }
-              if(widget.goToAppointmentScreen != null)
-                if(widget.returnBack)
-                  Navigator.pop(context);
-                widget.goToAppointmentScreen();
+              if(widget.tab != null){
+                if(widget.tab == 1){
+                  if(widget.goToCurrentScreen != null){
+                    currentReservation.CurrentReservationId = widget.reservationId;
+                    if(widget.returnBack)
+                      Navigator.pop(context);
+                    widget.goToCurrentScreen();
+                  }
+                }
+                else if(widget.tab != null && widget.tab == 2){
+                  if(widget.goToAppointmentScreen != null){
+                    if(widget.returnBack)
+                      Navigator.pop(context);
+                    widget.goToAppointmentScreen();
+                  }
+                }
+              }
+
               Navigator.pop(context);
               },
             child: Text('Done'),

@@ -228,7 +228,7 @@ class _BusinessDetailState extends State<BusinessDetail> {
                               );
                             },
                             child: Text(
-                              "Add Reservation",
+                              "Check In",
                               style: TextStyle(color: Colors.white),
                             ),
                           ),

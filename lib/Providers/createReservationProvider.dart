@@ -70,6 +70,8 @@ class createReservationProvider with ChangeNotifier {
           reservationTime: dateTime['Time'],
           goToCurrentScreen : goToCurrentScreen,
           returnBack : returnBack,
+          reservationId : resId,
+          tab : Provider.of<AppointmentTabIndex>(context).tab,
           //popDialog:(){Navigator.pop(context);}
         );
     });

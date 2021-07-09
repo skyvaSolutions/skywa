@@ -40,6 +40,9 @@ class _SearchPageState extends State<SearchPage> {
                 )),
             suffixIcon: Icon(Icons.clear, color: Colors.white),
             hintText: 'Search',
+            hintStyle: TextStyle(
+              color: Colors.white,
+            ),
             border: InputBorder.none,
           ),
         ),
@@ -59,6 +62,7 @@ class _SearchPageState extends State<SearchPage> {
                 address: search.isSearching == true
                     ? search.searchdata[index].address
                     : nearbyQs[index].address,
+                index: index,
               ),
             );
           }),

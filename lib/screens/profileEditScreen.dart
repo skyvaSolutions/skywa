@@ -6,6 +6,7 @@ import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skywa/DB/DB.dart';
 import 'package:skywa/Global&Constants/UserSettingsConstants.dart';
 import 'package:skywa/api_calls/add_user.dart';
 import 'package:skywa/api_responses/get_person.dart';
@@ -349,7 +350,8 @@ void onSavePressed(_formKey, BuildContext context) {
     //print(PersonID);
     if (_formKey.currentState.value.containsKey('Phone Number') &&
         _formKey.currentState.value['Phone Number'] != null) {
-      formValues['PersonPhoneNumber'] =
+      String countryCode = DB.box.get(DB.countryCallingCode);
+      formValues['PersonPhoneNumber'] = "+" + countryCode + " " +
           _formKey.currentState.value['Phone Number'];
     }
     formValues['PersonID'] = PersonID;

@@ -39,6 +39,8 @@ class appointmentScreenProvider with ChangeNotifier {
           _upcomingReservation.add(Reservation.fromJson(d[i]));
         else
           _activeReservation.add(Reservation.fromJson(d[i]));
+
+
       }
     }
     return true;

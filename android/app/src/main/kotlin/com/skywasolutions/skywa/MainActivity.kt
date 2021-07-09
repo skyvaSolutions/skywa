@@ -1,4 +1,4 @@
-package com.example.skywa
+package com.skywasolutions.skywa
 
 import io.flutter.embedding.android.FlutterActivity
 

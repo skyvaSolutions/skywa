@@ -14,6 +14,7 @@ import 'package:skywa/api_responses/recent_reservation.dart';
 import 'package:skywa/components/show_called_in_dialog.dart';
 import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/services/locationServices.dart';
+import 'package:skywa/utils/mail_phone.dart';
 import 'package:skywa/utils/open_google_map.dart';
 import 'package:timelines/timelines.dart';
 
@@ -79,7 +80,8 @@ Future<void> getLocation () async {
 
 class AppointmentStatus extends StatefulWidget {
   final Function() notifyGrandParent;
-  const AppointmentStatus({Key key ,@required this.notifyGrandParent}) : super(key: key);
+  final Function() goToAppointmentScreen;
+  const AppointmentStatus({Key key ,@required this.notifyGrandParent , this.goToAppointmentScreen}) : super(key: key);
   @override
   _AppointmentStatusState createState() => _AppointmentStatusState();
 }
@@ -313,6 +315,7 @@ class _AppointmentStatusState extends State<AppointmentStatus> {
           StatusMessage(
             updateParent: refresh,
             notifyGrandParent: widget.notifyGrandParent,
+            goToAppointmentScreen: widget.goToAppointmentScreen,
           ),
         ],
       ),
@@ -325,7 +328,8 @@ class StatusMessage extends StatefulWidget {
   final Function() updateParent;
   final Function() setUpTimedFetch ;
   final Function() notifyGrandParent;
-  const StatusMessage({Key key , @required this.updateParent ,  this.setUpTimedFetch , @required this.notifyGrandParent}) : super(key: key);
+  final Function() goToAppointmentScreen;
+  const StatusMessage({Key key , @required this.updateParent ,  this.setUpTimedFetch , @required this.notifyGrandParent , this.goToAppointmentScreen}) : super(key: key);
 
   @override
   _StatusMessageState createState() => _StatusMessageState();
@@ -418,8 +422,10 @@ class _StatusMessageState extends State<StatusMessage> {
               trailing : ElevatedButton(
                 onPressed: ()
                 async {
-                  getAndSortReservations();
-                  widget.notifyGrandParent();
+                  stopArrivedTimer = true;
+                  stopDistanceTimer = true;
+                  currentReservation.CurrentReservationId = null;
+                  widget.goToAppointmentScreen();
 
                 },
                 child: Text(
@@ -625,7 +631,10 @@ void _modalBottomSheetMenu(BuildContext context) {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      onTap: (){},
+                      onTap: (){
+                        String phoneNumber = currentReservation.currentRes.PhoneNumber;
+                        mailAndPhone.contact('tel:$phoneNumber');
+                      },
                     ),
                   ],
                 ),

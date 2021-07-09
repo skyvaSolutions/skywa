@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skywa/utils/mail_phone.dart';
 
 class ContactUs extends StatefulWidget {
   const ContactUs({Key key}) : super(key: key);
@@ -98,6 +99,9 @@ class _ContactUsState extends State<ContactUs> {
                         fontSize: 19.0
                     ),),
                     subtitle: Text('admin@skywasolutions.com'),
+                    onTap: (){
+                      mailAndPhone.contact('mailto:admin@skywasolutions.com');
+                    },
 
                   ),
                   SizedBox(

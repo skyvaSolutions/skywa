@@ -7,11 +7,11 @@ import 'package:skywa/screens/past_appointment_screen.dart';
 import 'package:skywa/screens/upcoming_appointment_screen.dart';
 
 class AppointmentTab extends StatefulWidget {
-  final id , name, address , tab ;
+  final id , name, address , tab , status;
   final Function() goToCurrentScreen;
   final Function() refreshParent;
 
-  AppointmentTab({Key key, this.id ,this.name, this.address , this.tab , this.goToCurrentScreen , this.refreshParent}) : super(key: key);
+  AppointmentTab({Key key, this.id ,this.name, this.address , this.tab , this.goToCurrentScreen , this.refreshParent , this.status}) : super(key: key);
 
   @override
   _AppointmentTabState createState() => _AppointmentTabState();
@@ -33,16 +33,34 @@ class _AppointmentTabState extends State<AppointmentTab> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: ListTile(
+              horizontalTitleGap: 10,
                 title: Text(
                   widget.name,
                   style: GoogleFonts.poppins(
                       fontSize: 17, fontWeight: FontWeight.w600),
                 ),
-                subtitle: Text(
-                  widget.address.toString().trim(),
-                  textAlign: TextAlign.left,
-                  style: GoogleFonts.poppins(
-                      fontSize: 15.2, fontWeight: FontWeight.w300),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.address.toString().trim(),
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.poppins(
+                          fontSize: 15.2, fontWeight: FontWeight.w300),
+                    ),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    if(widget.tab ==1 )
+                    Text(
+                      widget.status,
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.poppins(
+                          fontSize: 16, fontWeight: FontWeight.bold,
+                        color: widget.status == "Not Arrived" ? Theme.of(context).primaryColor : Color(0xFF3CD1BB),
+                      ),
+                    )
+                  ],
                 ),
                 trailing: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -63,9 +81,64 @@ class _AppointmentTabState extends State<AppointmentTab> {
                          )));
                     }
                     else if(widget.tab == 1){
-                      if(widget.goToCurrentScreen != null){
-                        currentReservation.CurrentReservationId = widget.id;
-                        widget.goToCurrentScreen();
+                      if(widget.id != currentReservation.CurrentReservationId && currentReservation.currentRes.MemberState != "Not Arrived"){
+                        showDialog(context: context, builder: (BuildContext context){
+                          return AlertDialog(
+                            content: RichText(
+                              text: TextSpan(
+                                text: 'You already have an appointment set up at ',
+                                style: TextStyle(
+                                  fontSize: 17.0,
+                                  color: Colors.black87
+                                ),
+                                children:  <TextSpan>[
+                                  TextSpan(text: currentReservation.currentRes.CompanyName, style: TextStyle(fontWeight: FontWeight.bold , fontSize: 17.0 , color: Colors.black87)),
+                                  TextSpan(text: " in " , style: TextStyle(fontSize: 17.0 , color: Colors.black87)),
+                                  TextSpan(text: currentReservation.currentRes.MemberState, style: TextStyle(fontWeight: FontWeight.bold , fontSize: 17.0 , color: Color(0xFF3CD1BB))),
+                                  TextSpan(text: " state " , style: TextStyle(fontSize: 17.0 , color: Colors.black87)),
+                                  TextSpan(text: ". \n\nDo you still wish to switch to another appointment?" , style: TextStyle(fontSize: 17.0 , color: Colors.black87)),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  onPressed: (){
+                                    Navigator.pop(context);
+                                  },
+                                child: Text(
+                                'No',
+                                  style: GoogleFonts.poppins(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: 17.0
+                                  ),
+                              ),
+                              ),
+                              TextButton(
+                                onPressed: (){
+                                  if(widget.goToCurrentScreen != null){
+                                    currentReservation.CurrentReservationId = widget.id;
+                                    widget.goToCurrentScreen();
+                                  }
+                                  Navigator.pop(context);
+                                },
+                                child: Text(
+                                  'Yes',
+                                  style: GoogleFonts.poppins(
+                                      color: Theme.of(context).primaryColor,
+                                      fontSize: 17.0
+                                  ),
+                                ),
+                              ),
+
+                            ],
+                          );
+                        } );
+                      }
+                      else{
+                        if(widget.goToCurrentScreen != null){
+                          currentReservation.CurrentReservationId = widget.id;
+                          widget.goToCurrentScreen();
+                        }
                       }
                     }
                     else if(widget.tab ==2 ){
@@ -82,12 +155,13 @@ class _AppointmentTabState extends State<AppointmentTab> {
 
                     }
                   },
-                  child: widget.tab != 1 ? Text("Show") : Text("Join"),
-                )),
+                  child: Text("Show"),
+                )
+
+            ),
           ),
         ),
       ),
     );
-    ;
   }
 }

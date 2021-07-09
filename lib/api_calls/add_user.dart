@@ -7,7 +7,7 @@ class AddUser{
 
 
   Future<http.Response> addNewUser( Map<String , String> formValues) async {
-    print("AddOrUpdatePersonPst api called");
+    print("AddOrUpdatePersonPost api called");
     final response = await http.post(
       Uri.parse("https://shoeboxtx.veloxe.com:36251/api/AddOrUpdatePersonPost"),
       headers: <String, String>{

@@ -13,6 +13,7 @@ import 'package:skywa/Providers/ThemeProvider.dart';
 import 'package:skywa/api_calls/find_users.dart';
 import 'package:skywa/api_responses/get_person.dart';
 import 'package:skywa/model/person.dart';
+import 'package:skywa/screens/current_sreen.dart';
 import 'package:skywa/screens/homeScreen.dart';
 import 'package:skywa/screens/onBoarding.dart';
 import 'package:skywa/services/deviceInfoService.dart';
@@ -21,7 +22,6 @@ import 'package:skywa/services/locationServices.dart';
 import 'package:skywa/services/qAPIServices.dart';
 import 'package:skywa/services/releaseStatusService.dart';
 import 'package:skywa/services/userServices.dart';
-
 class SplashScreen extends StatefulWidget {
   static const String id = 'splashScreen';
   @override
@@ -47,7 +47,9 @@ class _SplashScreenState extends State<SplashScreen> {
     getDeviceInfo(context);
     return Scaffold(
       body: Center(
-        child: Text('Put Some Cool Splash Screen Here'),
+        child: Container(
+            child: Image.asset('assets/images/logo example.png'),
+        ),
       ),
     );
   }
@@ -92,9 +94,12 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacementNamed(context, HomeScreen.id);
     }
 /////////////////////////calling GetMyPeople API to check whether there is a registered customer or not with this device//////////////////////////////////////////////////////
-     findUsers.returnPerson(context);
+    findUsers.returnPerson(context);
+    /////////////////////////////////////callinggetMyReservations to checj whether user has some reservations or not//////////////////
+    getAndSortReservations();
   }
 }
+
 Future<void> getProfileData() async {
   print("Getting profile Data");
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -105,9 +110,6 @@ Future<void> getProfileData() async {
       readBoolFromLocal(prefs, userSettings.userSetting1.key, false);
   userSettings.numUsages.value = updateNumberOfUsages(prefs);
 }
-
-
-
 
 class PushNotification {
   PushNotification({

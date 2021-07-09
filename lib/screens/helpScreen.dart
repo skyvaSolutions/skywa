@@ -20,7 +20,7 @@ class _HelpScreenState extends State<HelpScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
-            Icons.chevron_left,
+            Icons.arrow_back,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -41,16 +41,24 @@ class _HelpScreenState extends State<HelpScreen> {
             children: [
               Column(
                 children: [
-                  helpTile(context, "How do I do This?",
-                      "It is easy just push the green button"),
-                  helpTile(context, "How do I do That?",
-                      "It is easy just push the red button"),
-                  helpTileURL(
-                      context,
-                      "How do I do get More Info?",
-                      "Click More Info to get more Info",
-                      "More Info",
-                      "https://google.com"),
+                  helpTile(context, "How do I set my business up on Skywa?",
+                      "Download Skywa Manager and click set up new business."),
+                  helpTile(context, "Why do I need to turn on Location Services?",
+                      "Location services are used to know when you have arrived and let the business know that you are waiting close by."),
+                  helpTile(context, "How do I know when it is my turn to enter the business?",
+                      "You will receive a notification and if you have the Skywa open an alert will be displayed"),
+                  helpTile(context, "What if I decide to leave before I am called?",
+                      "You should click on the cancel button on the current appointment screen."),
+                  helpTile(context, "What does “Training Mode” mean?",
+                      "Businesses can set their company in training mode and teach their employees how to use Skywa.  To check in at a business in training mode you need a code provided by the business."),
+                  helpTile(context, "How can I advertise my business in Skywa?.",
+                      "Please contact us at support@skywasolutions.com"),
+                  // helpTileURL(
+                  //     context,
+                  //     "How do I do get More Info?",
+                  //     "Click More Info to get more Info",
+                  //     "More Info",
+                  //     "https://google.com"),
                 ],
               ),
             ],

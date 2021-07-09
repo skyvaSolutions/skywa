@@ -21,6 +21,7 @@ class FindUsers{
       if(res.length >0){
         getPerson.isPersonRegistered = true;
         Map<String , dynamic> resp = res[0];
+        print(resp);
         person =  Person.fromJson(resp);
         return person;
       }
@@ -37,10 +38,43 @@ class FindUsers{
   }
 
 
-  void returnPerson(BuildContext context) async {
+  Future<void> returnPerson(BuildContext context) async {
     Person person = await FindUsers().findPersonRegistered(context);
     if(getPerson.isPersonRegistered)
       getPerson.person = person;
+    getPerson.fetchedVal = initializeVariables();
+    print(getPerson.fetchedVal);
+  }
+
+  Map<String , String> initializeVariables(){
+    Map<String , String> fetchedValues = new Map<String , String>();
+    if(getPerson.isPersonRegistered){
+      if(getPerson.person.FirstName != "notSet")
+        fetchedValues['fullName'] = getPerson.person.FirstName;
+      if(getPerson.person.MiddleName != "notSet")
+        fetchedValues['fullName'] += " " + getPerson.person.MiddleName;
+      if(getPerson.person.LastName != "notSet")
+        fetchedValues['fullName'] += " " + getPerson.person.LastName;
+      if(getPerson.person.PersonEmail != "notSet")
+        fetchedValues['email'] =getPerson.person.PersonEmail;
+      if(getPerson.person.Address != "notSet")
+        fetchedValues['address'] = getPerson.person.Address;
+      if(getPerson.person.Birthday != "notSet")
+        fetchedValues['dob'] = getPerson.person.Birthday;
+      if(getPerson.person.Sex != "notSet")
+        fetchedValues['gender'] = getPerson.person.Sex;
+      if(getPerson.person.PersonPhoneNumber != "notSet")
+        fetchedValues['phoneNumber'] = getPerson.person.PersonPhoneNumber;
+    }
+    else{
+      fetchedValues['fullName'] = null;
+      fetchedValues['email'] = null;
+      fetchedValues['address'] = null;
+      fetchedValues['dob'] = null;
+      fetchedValues['gender'] = null;
+      fetchedValues['phoneNumber'] = null;
+    }
+    return fetchedValues;
   }
 
 

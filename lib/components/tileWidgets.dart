@@ -7,6 +7,7 @@ Column helpTile(BuildContext context, String title, String contents) {
   return Column(
     children: [
       MenuListTile(
+        icon: Icons.help_outline,
         title: title,
 //      icon: Icons.info_outline_rounded,
         onTap: () => {
@@ -27,7 +28,7 @@ Column helpTile(BuildContext context, String title, String contents) {
                   onPressed: () {
                     Navigator.of(ctx).pop();
                   },
-                  child: Text("okay"),
+                  child: Text("Okay"),
                   //,
                 ),
               ],
@@ -36,8 +37,8 @@ Column helpTile(BuildContext context, String title, String contents) {
         },
       ),
       Divider(
-        height: 10,
-        thickness: 5,
+        height: 1,
+        thickness: 1,
       )
     ],
   );
@@ -108,6 +109,7 @@ class MenuListTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
+        color: Color(0xFF4C44B3),
         //   size: kIconSettingSize,
         //  color: Colors.white,
       ),
@@ -145,7 +147,7 @@ class MenuListTileWithSwitch extends StatelessWidget {
       leading: Icon(
         icon,
         //   size: kIconSettingSize,
-        color: kIconColor,
+        color: Color(0xFF4C44B3),
       ),
       title: Text(
         title,
@@ -155,6 +157,7 @@ class MenuListTileWithSwitch extends StatelessWidget {
         height: 24,
         width: 48,
         child: CupertinoSwitch(
+          activeColor: Color(0xFF4C44B3),
           value: value ?? false,
           onChanged: (_) {
             onTap();
@@ -210,10 +213,10 @@ Widget createDrawerItem(
   return ListTile(
     title: Row(
       children: <Widget>[
-        Icon(icon),
+        Icon(icon , color : Colors.white),
         Padding(
           padding: EdgeInsets.only(left: 8.0),
-          child: Text(text),
+          child: Text(text , style: TextStyle(color: Colors.white),),
         )
       ],
     ),
@@ -223,23 +226,32 @@ Widget createDrawerItem(
 
 Widget createHeader() {
   return DrawerHeader(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.fill, image: AssetImage('assets/images/wait1.png'))),
-      child: Stack(children: <Widget>[
-        Positioned(
-            bottom: 0.0,
-            // left: 16.0,
-            child: Center(
-              child: Text("",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.teal.shade700,
-                      fontSize: 12.0,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500)),
+      margin: EdgeInsets.only(top: 40.0),
+      padding: EdgeInsets.all(20.0),
+      //decoration:
+      // BoxDecoration(
+      //     image: DecorationImage(
+      //          image: AssetImage('assets/images/wait1.png'))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+      ClipRRect(
+      borderRadius: BorderRadius.circular(50),
+            child : Image.asset(
+              'assets/images/icon white background.png',
+              width: 75,
+              height: 75,
+              fit: BoxFit.fill,
             )),
-      ]));
+        SizedBox(
+          height: 20.0,
+        ),
+        Text('Welcome',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 22.0,
+                fontWeight: FontWeight.w500)),
+      ]
+      ));
 }

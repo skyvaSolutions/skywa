@@ -75,8 +75,7 @@ class NearbyQsModel {
         openTime: json["OpenTime"],
         closeTime: json["CloseTime"],
         maxReservationDistance: json["MaxReservationDistance"],
-        earliestAvailableReservation:
-            DateTime.parse(json["EarliestAvailableReservation"]),
+        earliestAvailableReservation:DateTime.parse(json["EarliestAvailableReservation"]),
       );
 
   Map<String, dynamic> toJson() => {

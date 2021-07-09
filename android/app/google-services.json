@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "908414587240",
-    "project_id": "skywa-7f403",
-    "storage_bucket": "skywa-7f403.appspot.com"
+    "project_number": "872636635620",
+    "project_id": "skywa-2ce0f",
+    "storage_bucket": "skywa-2ce0f.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:908414587240:android:ca16b0d629ea57f00b86dd",
+        "mobilesdk_app_id": "1:872636635620:android:3146651b77955b48868ff1",
         "android_client_info": {
-          "package_name": "com.example.skywa"
+          "package_name": "com.skywasolutions.skywa"
         }
       },
       "oauth_client": [
         {
-          "client_id": "908414587240-720uv19cbllujmtep1udohssid7rbc5g.apps.googleusercontent.com",
+          "client_id": "872636635620-56hk32al9vc7hsv4hbdbfa5r9hhakpt9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.skywa",
-            "certificate_hash": "6b38932e69944046f7af8d028eb96bbb7794e826"
+            "package_name": "com.skywasolutions.skywa",
+            "certificate_hash": "c413529dfd9bbdc96199a05aa2dcb2ac3a5d7324"
           }
         },
         {
-          "client_id": "908414587240-u23v73f2c86400bkk2otthdq3mdgl3h6.apps.googleusercontent.com",
+          "client_id": "872636635620-3542sjidshncu7e64mqgvaqm2mr9ggpo.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCjyRNhVP3HagA2owr0pem95hGHacfdpAQ"
+          "current_key": "AIzaSyAjYQye864UAsmDq2qIfzrSfs2gfeL7NqM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "908414587240-u23v73f2c86400bkk2otthdq3mdgl3h6.apps.googleusercontent.com",
+              "client_id": "872636635620-3542sjidshncu7e64mqgvaqm2mr9ggpo.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

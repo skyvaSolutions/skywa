@@ -35,7 +35,7 @@ class _SettingScreenState extends State<SettingScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(
-            Icons.chevron_left,
+            Icons.arrow_back,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -80,60 +80,60 @@ class _SettingScreenState extends State<SettingScreen> {
                       onTap: () {
                         prov.changeMode();
                       }),
-                  MenuListTile(
-                    title: "Tell a friend about " + appName,
-                    icon: Icons.share,
-                    onTap: () => {
-                      // if (userDevice.isIOS)
-                      //   {
-                      //     Share.share('Download our cool new App' + appName,
-                      //         subject: 'Check Out ' +
-                      //             appName +
-                      //             '\n  ' +
-                      //             appleStoreURL)
-                      //   }
-                      // else
-                      //   {
-                      //     Share.share('Download our cool new App' + appName,
-                      //         subject: 'Check Out ' +
-                      //             appName +
-                      //             '\n  ' +
-                      //             androidStoreURL)
-                      //   }
-                    },
-                  ),
-
+                  // MenuListTile(
+                  //   title: "Tell a friend about " + appName,
+                  //   icon: Icons.share,
+                  //   onTap: () => {
+                  //     // if (userDevice.isIOS)
+                  //     //   {
+                  //     //     Share.share('Download our cool new App' + appName,
+                  //     //         subject: 'Check Out ' +
+                  //     //             appName +
+                  //     //             '\n  ' +
+                  //     //             appleStoreURL)
+                  //     //   }
+                  //     // else
+                  //     //   {
+                  //     //     Share.share('Download our cool new App' + appName,
+                  //     //         subject: 'Check Out ' +
+                  //     //             appName +
+                  //     //             '\n  ' +
+                  //     //             androidStoreURL)
+                  //     //   }
+                  //   },
+                  // ),
                   //
-                  MenuListTile(
-                      title: "Rate Us", icon: Icons.star, onTap: () => {}),
-
-                  MenuListTile(
-                      title: "Contact Us",
-                      icon: Icons.email,
-                      onTap: () => {sendemail()}),
-
-                  MenuListTile(
-                    title: "About",
-                    icon: Icons.info_outline_rounded,
-                    onTap: () => {
-                      showAlert(
-                          context,
-                          appName,
-                          "Version " +
-                              packageInfo.version +
-                              " Build " +
-                              packageInfo.buildNumber +
-                              "\n\nDeveloped by " +
-                              companyName +
-                              "\n")
-                    },
-                  ),
-
-                  MenuListTile(
-                    title: "Help",
-                    icon: Icons.help,
-                    onTap: () => {Navigator.pushNamed(context, HelpScreen.id)},
-                  ),
+                  // //
+                  // MenuListTile(
+                  //     title: "Rate Us", icon: Icons.star, onTap: () => {}),
+                  //
+                  // MenuListTile(
+                  //     title: "Contact Us",
+                  //     icon: Icons.email,
+                  //     onTap: () => {sendemail()}),
+                  //
+                  // MenuListTile(
+                  //   title: "About",
+                  //   icon: Icons.info_outline_rounded,
+                  //   onTap: () => {
+                  //     showAlert(
+                  //         context,
+                  //         appName,
+                  //         "Version " +
+                  //             packageInfo.version +
+                  //             " Build " +
+                  //             packageInfo.buildNumber +
+                  //             "\n\nDeveloped by " +
+                  //             companyName +
+                  //             "\n")
+                  //   },
+                  // ),
+                  //
+                  // MenuListTile(
+                  //   title: "Help",
+                  //   icon: Icons.help,
+                  //   onTap: () => {Navigator.pushNamed(context, HelpScreen.id)},
+                  // ),
                 ],
               ),
             ],
